@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="cn">
+    
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport" />
+    <meta name="description" content="CMake教程（一）：CMake基础用法" />
+    <meta name="hexo-theme-A4" content="v1.9.6" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.jpg">
+    <title>Cz | A Chinese coder now living in SG</title>
+
+    
+        
+<link rel="stylesheet" href="/css/highlight/style1.css">
+
+        
+<link rel="stylesheet" href="/css/reset.css">
+
+        
+<link rel="stylesheet" href="/css/markdown.css">
+
+        
+<link rel="stylesheet" href="/css/fonts.css">
+ 
+         <!--注意：首页既不是post也不是page-->
+        
+            
+<link rel="stylesheet" href="/css/waline.css">
+
+        
+        
+        
+<link rel="stylesheet" href="/css/ui.css">
+ 
+        
+<link rel="stylesheet" href="/css/style.css">
+
+
+        
+            <!--返回顶部css-->
+            
+<link rel="stylesheet" href="/css/returnToTop.css">
+
+            
+<link rel="stylesheet" href="/css/unicons.css">
+
+        
+        
+            <!--目录-->
+            
+<link rel="stylesheet" href="/css/toc.css">
+
+        
+    
+
+    
+        
+<link rel="stylesheet" href="/css/returnToLastPage.css">
+
+    
+    
+   
+<link rel="stylesheet" href="/css/lightgallery-bundle.min.css">
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+    
+    
+
+    
+    
+
+
+
+    
+
+    
+    
+
+    
+    
+    
+    <body>
+        <script src="/js/darkmode-js.min.js"></script>
+        
+        <script>
+            const options = {
+                bottom: '40px', // default: '32px'
+                right: 'unset', // default: '32px'
+                left: '42px', // default: 'unset'
+                time: '0.3s', // default: '0.3s'
+                mixColor: '#fff', // default: '#fff'
+                backgroundColor: ' #e4e4e4 ',  // default: '#fff'
+                buttonColorDark: '#100f2c',  // default: '#100f2c'
+                buttonColorLight: '#fff', // default: '#fff'
+                saveInCookies: true, // default: true,
+                label: '🌓', // default: ''
+                autoMatchOsTheme: true // default: true
+            }
+            const darkmode = new Darkmode(options);
+            darkmode.showWidget();
+        </script>
+        
+        
+            <div class="left-toc-container">
+                <nav id="toc" class="bs-docs-sidebar"></nav>
+            </div>
+        
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+
+
+<div class="header">
+    <div class="header-container">
+        <style>
+            .header-img {
+                width: 56px;
+                height: auto;
+                object-fit: cover; /* 保持图片比例 */
+                transition: transform 0.3s ease-in-out; 
+                border-radius: 50%; 
+            }
+            
+        </style>
+        <img 
+            alt="^-^" 
+            cache-control="max-age=86400" 
+            class="header-img" 
+            src="/img/favicon.jpg" 
+        />
+        <div class="header-content">
+            <a class="logo" href="/">Cz</a> 
+            <span class="description">#define ME &#34;A coder&#34;</span> 
+        </div>
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">🏃主页</a></li>
+            
+        
+            
+                <li><a href="/list/">🖋️文章</a></li>
+            
+        
+            
+                <li><a href="/tags/">📌标签</a></li>
+            
+        
+            
+                <li><a href="/categories/">🔖分类</a></li>
+            
+        
+            
+                <li><a href="/about/">🙈关于</a></li>
+            
+        
+            
+                <li><a href="/now/">📆碎片</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+    
+
+    
+        
+            
+                <div class="post-main-title" style="text-align: center;">
+                    CMake教程（一）：CMake基础用法
+                </div>
+            
+        
+      
+    
+
+    
+
+        
+            <div class="post-head-meta-center">
+        
+                
+                    <span>最近更新：2025-01-24</span> 
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                     <span>字数总计：2.9k</span>
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                    <span>阅读估时：11分钟</span>
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                    <span id="busuanzi_container_page_pv">
+                        阅读量：<span id="busuanzi_value_page_pv"></span>次
+                    </span>
+                
+            </div>
+    
+
+    <div class="post-md">
+        
+            
+        
+        <div class=".article-gallery"><h2 id="0-引子"><a href="#0-引子" class="headerlink" title="0. 引子"></a>0. 引子</h2><p><a target="_blank" rel="noopener" href="https://cmake.org/">CMake</a>是一款Kitware开源的、跨平台的项目构建系统。它可以根据编译平台，自动生成<code>Makefile</code>或其他构建系统（如<code>Visual Studio</code>工程、<code>Xcode</code>工程等）所需要的构建文件，最后用户只需<code>make</code>编译即可。它的优点如下：</p>
+<ul>
+<li>支持跨平台开发</li>
+<li>方便管理大型项目</li>
+<li>简化编译构建过程和编译过程</li>
+<li>可扩展：可以为<code>CMake</code>编写特定功能的模块，扩充<code>CMake</code>功能</li>
+</ul>
+<p>由于工作中经常需要维护一些老旧<code>C/C++</code>项目，而这些项目很多还在使用<code>Makefile</code>作为项目编译工具，手写依赖往往令人头大。使用<code>CMake</code>重构旧项目的编译系统，可以有效减轻维护负担。笔者希望这个系列，能够删繁就简，对<code>CMake</code>初学者有所帮助。</p>
+<hr>
+<h2 id="1-基本流程"><a href="#1-基本流程" class="headerlink" title="1. 基本流程"></a>1. 基本流程</h2><p>一个标准的<code>CMake</code>使用流程只需要以下3个简单步骤：</p>
+<ol>
+<li>在项目中创建一个<code>CMakeLists.txt</code>文件，告诉<code>CMake</code>要编译哪些源文件；</li>
+<li>运行<code>CMake</code>，自动生成构建文件（如<code>Makefile</code>）；</li>
+<li>用生成的构建文件编译并生成可执行文件。</li>
+</ol>
+<p>下面我们使用一个最简单的<code>CMake</code>项目来做演示。</p>
+<h3 id="1-1-文件结构"><a href="#1-1-文件结构" class="headerlink" title="1.1 文件结构"></a>1.1 文件结构</h3><p>在项目根目录下，新建一个名为<code>main.cpp</code>的源文件，同时新建一个名为<code>CMakeLists.txt</code>的文件(<code>CMake</code>配置文件)：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">my_project/</span><br><span class="line">├── main.cpp</span><br><span class="line">└── CMakeLists.txt</span><br></pre></td></tr></table></figure>
+<h3 id="1-2-编写main-cpp"><a href="#1-2-编写main-cpp" class="headerlink" title="1.2 编写main.cpp"></a>1.2 编写main.cpp</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// my_project/main.cpp</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Hello, CMake!&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-3-编写CMakeLists-txt"><a href="#1-3-编写CMakeLists-txt" class="headerlink" title="1.3 编写CMakeLists.txt"></a>1.3 编写CMakeLists.txt</h3><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># my_project/CMakeLists.txt</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#[[指定 CMake 的最低版本</span></span><br><span class="line"><span class="comment">   可选</span></span><br><span class="line"><span class="comment">   非必须]]</span></span><br><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.14</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置项目名称为 HelloCMake</span></span><br><span class="line"><span class="keyword">project</span>(HelloCMake)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加可执行文件</span></span><br><span class="line"><span class="keyword">add_executable</span>(hello main.cpp)</span><br></pre></td></tr></table></figure>
+
+<p><code>CMake</code>支持大写、小写、混合大小写的命令。在编写<code>CMakeLists.txt</code>文件时使用的工具如果有对应的命令提示，大小写随缘即可，但应尽量保持一致。</p>
+<p>接下来依次介绍一下在<code>CMakeLists.txt</code>文件中出现的注释语法和三个命令：</p>
+<h4 id="1-3-1-注释"><a href="#1-3-1-注释" class="headerlink" title="1.3.1 注释"></a>1.3.1 注释</h4><ul>
+<li><code>CMake</code>使用<code>#</code>进行 <strong>单行注释</strong>，可以放在任何位置</li>
+</ul>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 指定 CMake 的最低版本</span></span><br><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.0</span>.<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>CMake</code>使用<code>#[[  ]]</code>进行 <strong>块注释</strong>，注意<code>#</code>与<code>[[</code>之间不能有空格</li>
+</ul>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#[[指定 CMake 的最低版本</span></span><br><span class="line"><span class="comment">   可选</span></span><br><span class="line"><span class="comment">   非必须]]</span></span><br><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.14</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-3-2-命令"><a href="#1-3-2-命令" class="headerlink" title="1.3.2 命令"></a>1.3.2 命令</h4><ul>
+<li><code>cmake_minimum_required</code>：指定使用的<code>CMake</code>最低版本，用于避免版本兼容问题。<ul>
+<li>这个命令可选但非必须，如果不加可能会有警告;</li>
+<li>可以是一个范围，如：<code>cmake_minimum_required(VERSION 3.10...3.21)</code></li>
+</ul>
+</li>
+<li><code>project</code>：定义工程项目名称，其余可忽略的项目包括（指定工程的版本、描述、web主页地址、支持的语言（默认支持所有语言）），语法指令如下：  <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># project 指令的语法：</span></span><br><span class="line"><span class="keyword">project</span>(&lt;<span class="keyword">PROJECT</span>-NAME&gt; [&lt;language-name&gt;...])</span><br><span class="line"><span class="keyword">project</span>(&lt;<span class="keyword">PROJECT</span>-NAME&gt;</span><br><span class="line">    [VERSION &lt;major&gt;[.&lt;minor&gt;[.&lt;patch&gt;[.&lt;tweak&gt;]]]]</span><br><span class="line">    [DESCRIPTION &lt;<span class="keyword">project</span>-description-<span class="keyword">string</span>&gt;]</span><br><span class="line">    [HOMEPAGE_URL &lt;url-<span class="keyword">string</span>&gt;]</span><br><span class="line">    [LANGUAGES &lt;language-name&gt;...])</span><br></pre></td></tr></table></figure></li>
+<li><code>add_executable</code>：定义工程会生成一个名为<code>hello</code>的可执行程序，它的源文件是<code>main.cpp</code>，这个可执行程序名和<code>project</code>的项目名没有任何关系  <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_executable</span>(可执行程序名 源文件名称)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="1-4-编译运行"><a href="#1-4-编译运行" class="headerlink" title="1.4 编译运行"></a>1.4 编译运行</h3><p>由于<code>CMakeLists.txt</code>文件所在目录执行了<code>cmake</code>命令后会生成一些目录和文件(包括<code>Makefile</code>文件)，如果再基于<code>Makefile</code>文件执行<code>make</code>命令，程序在编译过程中还会产生中间文件与最终的可执行文件，这样会导致整个项目目录看起来非常混乱，不容易管理与维护，因此建议把生成的与项目源代码无关的文件统一放到一个对应的目录下面，一般将这个目录命名为<code>build</code>。</p>
+<p>同时由于<code>cmake</code>命令是在<code>build</code>目录中执行的，但是<code>CMakeLists.txt</code>文件位于<code>build</code>目录的上一级目录中，所以<code>cmake</code>命令后指定的路径为<code>..</code>，即当前目录的上一级目录。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">1. 进入 terminal，在项目根目录下新建 build 文件夹并进入</span></span><br><span class="line">mkdir build</span><br><span class="line">cd build</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">2. 运行 CMake，此时 CMake 会自动生成 Makefile 构建文件</span></span><br><span class="line">cmake ..</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">3. 执行 make 命令开始编译</span></span><br><span class="line">make</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">4. 运行生成的可执行文件</span></span><br><span class="line">./hello</span><br></pre></td></tr></table></figure>
+<p>这时候你会看到输出：<code>Hello, CMake!</code>。恭喜，你完成了一个最简单的<code>CMake</code>项目。</p>
+<h2 id="2-支持多源文件和多目录"><a href="#2-支持多源文件和多目录" class="headerlink" title="2. 支持多源文件和多目录"></a>2. 支持多源文件和多目录</h2><h3 id="2-1-添加多个源文件"><a href="#2-1-添加多个源文件" class="headerlink" title="2.1 添加多个源文件"></a>2.1 添加多个源文件</h3><p>实际项目中，源代码文件往往不止一个，<code>CMake</code>允许在<code>add_executable()</code>中添加多个源文件，源文件名可以用<code>空格</code>或<code>;</code>分隔，<code>CMake</code>负责将他们编译成一个可执行文件：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">project/</span><br><span class="line">├── main.cpp</span><br><span class="line">├── helper1.cpp</span><br><span class="line">├── helper2.cpp</span><br><span class="line">└── CMakeLists.txt</span><br></pre></td></tr></table></figure>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># CMakeLists.txt</span></span><br><span class="line"><span class="keyword">add_executable</span>(hello1 main.cpp helper1.cpp helper2.cpp)</span><br><span class="line"><span class="keyword">add_executable</span>(hello2 main.cpp;helper1.cpp;helper2.cpp)</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-定义变量管理多个源文件"><a href="#2-2-定义变量管理多个源文件" class="headerlink" title="2.2 定义变量管理多个源文件"></a>2.2 定义变量管理多个源文件</h3><p>假设多个源文件反复被使用，每次都手动列出它们的名字显得很麻烦，此时我们可以定义一个变量，将文件名对应的字符串存储起来，在<code>cmake</code>里定义变量需要使用<code>set()</code>命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">set</span> 指令的语法：</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">VAR: 变量名；VALUE：变量值</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">[] 中的参数为可选项，如不需要可以不写，源文件名可以使用空格或 ; 分隔</span></span><br><span class="line">set(VAR [VALUE] [CACHE TYPE DOCSTRING [FORCE]])</span><br></pre></td></tr></table></figure>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(SOURCES main.cpp helper1.cpp helper2.cpp)</span><br><span class="line"><span class="keyword">add_executable</span>(hello <span class="variable">$&#123;SOURCES&#125;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-管理多个目录"><a href="#2-3-管理多个目录" class="headerlink" title="2.3 管理多个目录"></a>2.3 管理多个目录</h3><p>随着开发的进行，项目的源代码可能会被分散到多个目录中，比如在<code>src/</code>目录存放核心代码，<code>include/</code>目录存放头文件用于分发，<code>libs/</code>目录存放外部库文件等。如果只使用根目录下的一个<code>CMakeLists.txt</code>，那么这个文件相对会比较复杂。<code>CMake</code>支持在每个源码目录都添加一个<code>CMakeLists.txt</code>（头文件目录不需要）来管理多个目录代码。可以参考下方目录结构：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">my_project/</span><br><span class="line">├── CMakeLists.txt       # 根目录的 CMake 配置</span><br><span class="line">├── src/</span><br><span class="line">│   ├── CMakeLists.txt   # src 目录下的 CMake 配置</span><br><span class="line">│   ├── main.cpp</span><br><span class="line">│   ├── utils.cpp</span><br><span class="line">│   └── helper.cpp</span><br><span class="line">├── libs/</span><br><span class="line">│   ├── CMakeLists.txt   # libs 目录下的 CMake 配置</span><br><span class="line">│   ├── lib.cpp</span><br><span class="line">│   └── lib.h</span><br><span class="line">├── include/</span><br><span class="line">│   ├── utils.h</span><br><span class="line">│   └── helper.h</span><br><span class="line">└── build/               # 构建目录（自动创建）</span><br></pre></td></tr></table></figure>
+<p>在这个项目结构中，根目录下有一个<code>CMakeLists.txt</code>文件，它负责管理整个项目。而<code>src/</code>和<code>libs/</code>目录下分别有各自的<code>CMakeLists.txt</code>文件，用来管理这些目录中的源文件和库。这样，不仅让项目更有条理，而且也更方便管理。接下来我们首先了解一些关于<code>CMakeLists.txt</code>文件作用于的信息，再依次分析一下各个文件中需要添加的内容。</p>
+<h4 id="2-3-1-节点关系"><a href="#2-3-1-节点关系" class="headerlink" title="2.3.1 节点关系"></a>2.3.1 节点关系</h4><p>由于Linux的目录是树状结构，所以嵌套的<code>CMake</code>也是一个树状结构，最顶层的<code>CMakeLists.txt</code>是根节点，其次都是子节点。因此，不同目录下<code>CMakeLists.txt</code>文件变量的作用域也不同：</p>
+<ul>
+<li>根节点<code>CMakeLists.txt</code>中的<strong>变量全局有效</strong></li>
+<li>父节点<code>CMakeLists.txt</code>中的<strong>变量可以在子节点中使用</strong></li>
+<li>子节点<code>CMakeLists.txt</code>中的<strong>变量只能在当前节点中使用</strong></li>
+</ul>
+<p>那么<code>CMake</code>中父子节点之间的关系是如何建立的呢？这里需要用到一个<code>CMake</code>命令：<code>add_subdirectory()</code></p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_subdirectory</span>(source_dir [binary_dir] [EXCLUDE_FROM_ALL])</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>source_dir</code>：指定了<code>CMakeLists.txt</code>中源文件和代码文件的位置，其实就是指定子目录</li>
+<li><code>binary_dir</code>：指定了输出文件的路径，一般不需要指定，忽略即可。</li>
+<li><code>EXCLUDE_FROM_ALL</code>：在子路径下的目标默认不会被包含到父路径的ALL目标里，并且也会被排除在IDE工程文件之外。用户必须显式构建在子路径下的目标。</li>
+</ul>
+<h4 id="2-3-2-根目录的CMakeLists-txt"><a href="#2-3-2-根目录的CMakeLists-txt" class="headerlink" title="2.3.2 根目录的CMakeLists.txt"></a>2.3.2 根目录的CMakeLists.txt</h4><p>在根目录的<code>CMakeLists.txt</code>文件中，变量全局有效，因此我们通常做一些全局的配置，比如设置项目的名字、指定<code>CMake</code>最低版本要求，以及引入子目录等。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 根目录的 CMakeLists.txt</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置项目名和 CMake 最低版本</span></span><br><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.14</span>)</span><br><span class="line"><span class="keyword">project</span>(MyProject)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加 src，libs 子目录</span></span><br><span class="line"><span class="keyword">add_subdirectory</span>(src)</span><br><span class="line"><span class="keyword">add_subdirectory</span>(libs)</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-3-3-src-子目录的CMakeLists-txt"><a href="#2-3-3-src-子目录的CMakeLists-txt" class="headerlink" title="2.3.3 src&#x2F; 子目录的CMakeLists.txt"></a>2.3.3 src&#x2F; 子目录的CMakeLists.txt</h4><p>在<code>src/</code>子目录中的<code>CMakeLists.txt</code>文件内容如下：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># src/CMakeLists.txt</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置源文件</span></span><br><span class="line"><span class="keyword">set</span>(SOURCES</span><br><span class="line">    main.cpp</span><br><span class="line">    utils.cpp</span><br><span class="line">    helper.cpp</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建可执行文件</span></span><br><span class="line"><span class="keyword">add_executable</span>(hello <span class="variable">$&#123;SOURCES&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置头文件路径</span></span><br><span class="line"><span class="keyword">target_include_directories</span>(hello PRIVATE <span class="variable">$&#123;PROJECT_SOURCE_DIR&#125;</span>/<span class="keyword">include</span>)</span><br><span class="line"><span class="comment"># PROJECT_SOURCE_DIR：这是一个 CMake 内置的变量，表示项目的源代码根目录。</span></span><br><span class="line"><span class="comment"># 无论你在哪个子目录中，它都会指向项目的最外层目录：即 my_project/</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 链接库</span></span><br><span class="line"><span class="keyword">target_link_libraries</span>(hello PRIVATE mylib)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用<code>set(SOURCES ...)</code>将<code>src/</code>目录下的源文件名赋值给变量<code>SOURCES</code>；</li>
+<li>使用<code>add_executable()</code>创建可执行文件<code>hello</code>；</li>
+<li>使用<code>target_include_directories()</code>设置头文件路径，指向根目录下的<code>include/</code>目录，让编译器可以找到头文件；</li>
+<li>使用<code>target_link_libraries()</code>链接一个外部库<code>mylib</code>（假设它在<code>libs、</code>目录下）。</li>
+</ul>
+<h4 id="2-3-4-libs-子目录的CMakeLists-txt"><a href="#2-3-4-libs-子目录的CMakeLists-txt" class="headerlink" title="2.3.4 libs&#x2F; 子目录的CMakeLists.txt"></a>2.3.4 libs&#x2F; 子目录的CMakeLists.txt</h4><p>在<code>libs/</code>子目录中的<code>CMakeLists.txt</code>文件内容如下：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># libs/CMakeLists.txt</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置库文件源代码</span></span><br><span class="line"><span class="keyword">set</span>(LIB_SOURCES</span><br><span class="line">    lib.cpp</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建静态库</span></span><br><span class="line"><span class="keyword">add_library</span>(mylib STATIC <span class="variable">$&#123;LIB_SOURCES&#125;</span>) <span class="comment"># STATIC 可改为 SHARED 生成动态库</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置头文件路径</span></span><br><span class="line"><span class="keyword">target_include_directories</span>(mylib PUBLIC <span class="variable">$&#123;PROJECT_SOURCE_DIR&#125;</span>/<span class="keyword">include</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用<code>set(LIB_SOURCES) ...</code>将<code>libs/</code>目录下的源文件名赋值给变量<code>LIB_SOURCES</code>；</li>
+<li>使用<code>add_library()</code>创建了一个静态库<code>mylib</code>，关于库的类型之后的文章里会有更详细的说明；</li>
+<li>使用<code>target_include_directories()</code>设置库的头文件路径，指向根目录下的<code>include/</code>目录，通过<code>PUBLIC</code>关键字，确保其他需要引用<code>mylib</code>的目标能够找到头文件。</li>
+</ul>
+<h4 id="2-3-5-项目根目录的头文件（include-）"><a href="#2-3-5-项目根目录的头文件（include-）" class="headerlink" title="2.3.5 项目根目录的头文件（include&#x2F;）"></a>2.3.5 项目根目录的头文件（include&#x2F;）</h4><p>在<code>include/</code>目录下存放了项目的头文件。需要注意的是，我们不需要在<code>src/</code>和<code>libs/</code>的<code>CMakeLists.txt</code>文件中列出这些头文件。<br><code>CMake</code>会自动知道你从<code>include/</code>目录中包含头文件，只要你确保<code>src/</code>和<code>libs/</code>目录下的<code>CMakeLists.txt</code>文件中正确配置了<code>target_include_directories()</code>。</p>
+<h4 id="2-3-6-构建项目"><a href="#2-3-6-构建项目" class="headerlink" title="2.3.6 构建项目"></a>2.3.6 构建项目</h4><p>一切准备就绪后，开始构建项目，进入到根节点目录的<code>build</code>目录中，按照<a href="#1.4%E7%BC%96%E8%AF%91%E8%BF%90%E8%A1%8C">1.4</a>示例中的指令进行构建和编译即可。编译完成后，所有生成的文件（包括目标文件、可执行文件等）都会被放到<code>build/</code>目录中。<br>这种多目录的管理方式，会让你的项目变得更加模块化、易于扩展，同时也方便多人协作开发。如果以后需要添加新的库或源文件，只需在对应子目录的<code>CMakeLists.txt</code>中做调整，而根目录只需要引入子目录即可。</p>
+<h2 id="3-小结："><a href="#3-小结：" class="headerlink" title="3. 小结："></a>3. 小结：</h2><p><code>CMake</code>可以非常有效地管理多个目录下的源代码和库，简化编译构建过程和编译过程：</p>
+<ul>
+<li>使用<code>cmake_minimum_required()</code>指定最低版本；</li>
+<li>使用<code>project()</code>设置项目名；</li>
+<li>使用<code>add_executable()</code>添加可执行文件；</li>
+<li>使用<code>set()</code>定义变量管理多个源文件；</li>
+<li>使用<code>target_include_directories()</code>确保头文件可以被正确引用；</li>
+<li>使用<code>target_link_libraries()</code>链接一个库；</li>
+<li>使用<code>add_library()</code>创建静态&#x2F;动态库；</li>
+<li>根目录的<code>CMakeLists.txt</code>负责引入子目录和进行全局配置；</li>
+<li>每个子目录（如<code>src/</code>和<code>libs/</code>）都有自己的<code>CMakeLists.txt</code>来管理该目录下的源文件和库；</li>
+<li><code>build/</code>目录用来存放所有构建过程中生成的中间文件和最终的可执行文件，保持源代码目录整洁。</li>
+</ul>
+<h2 id="4-下篇预告"><a href="#4-下篇预告" class="headerlink" title="4. 下篇预告"></a>4. 下篇预告</h2><ul>
+<li>变量操作</li>
+<li>文件搜索</li>
+<li>流程控制</li>
+<li>第三方库依赖管理</li>
+</ul>
+</div>
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2025-01-24</span>
+            
+                <span>该篇文章被 Zhang Chao</span>
+            
+            
+                <span>打上标签:
+                    
+                    
+                        <a href='/tags/CMake/'>
+                            CMake
+                        </a>
+                    
+                </span>
+             
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/%E5%B7%A5%E5%85%B7/'>
+                            工具
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    <br>
+    
+    
+        
+            
+    
+            <div class="post-footer-pre-next">
+                
+
+                
+                    <span class="post-footer-pre-next-last-span-right">下一篇：<a href="/2025/01/13/hello-new-blog/">你好，新博客</a>
+                    </span>
+                
+            </div>
+    
+        
+    
+
+    
+        
+    <div class="comments-container">
+    <div id="comment-anchor"></div>
+    <div class="comment-area-title">
+         
+    </div>
+    
+        
+
+    
+    
+    
+    </div>
+
+
+     
+</div>
+
+
+
+                                      
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2025 Cz 
+
+            
+                
+
+            
+                
+                    / <a href="/contact/"> 联系 </a>
+                
+
+            
+        </span>
+       
+    
+</div>
+
+
+
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>🌊亦余心之所善兮，虽九死其犹未悔🌊</span>
+            
+                <span class="footer-last-span-right"><i>本站由<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/index.html">Hexo</a>驱动｜使用<a target="_blank" rel="noopener" href="https://github.com/HiNinoJay/hexo-theme-A4">Hexo-theme-A4</a>主题</i></span>
+            
+    
+</div>
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+    <!--目录-->
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript" ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" type="text/javascript" ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js" type="text/javascript" ></script>
+        
+<script src="/js/toc.js"></script>
+
+    
+
+    
+<script src="/js/randomHeaderContent.js"></script>
+
+    <!--回到顶部按钮-->
+    
+        
+<script src="/js/returnToTop.js"></script>
+
+    
+
+    
+        
+<script src="/js/returnToLastPage.js"></script>
+
+    
+
+
+
+
+
+<script src="/js/lightgallery/lightgallery.umd.min.js"></script>
+
+
+
+<script src="/js/lightgallery/plugins/lg-thumbnail.umd.min.js"></script>
+
+
+
+<script src="/js/lightgallery/plugins/lg-fullscreen.umd.min.js"></script>
+
+
+<script src="/js/lightgallery/plugins/lg-autoplay.umd.min.js"></script>
+
+
+<script src="/js/lightgallery/plugins/lg-zoom.umd.min.js"></script>
+
+
+<script src="/js/lightgallery/plugins/lg-rotate.umd.min.js"></script>
+
+
+<script src="/js/lightgallery/plugins/lg-paper.umd.min.js"></script>
+
+
+
+
+<script type="text/javascript">
+     
+    if (typeof lightGallery !== "undefined") {
+        var options1 = {
+            selector: '.gallery-item',
+            plugins: [lgThumbnail, lgFullscreen, lgAutoplay, lgZoom, lgRotate, lgPager], // 启用插件
+            thumbnail: true,          // 显示缩略图
+            zoom: true,               // 启用缩放功
+            rotate: true,             // 启用旋转功能能
+            autoplay: true,        // 启用自动播放功能
+            fullScreen: true,      // 启用全屏功能
+            pager: false, //页码,
+            zoomFromOrigin: true,   // 从原始位置缩放
+            actualSize: true,       // 启用查看实际大小的功能
+            enableZoomAfter: 300,    // 延迟缩放，确保图片加载完成后可缩放
+        };
+        lightGallery(document.getElementsByClassName('.article-gallery')[0], options1); // 修复选择器
+    }
+    
+</script>
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script> 
+
+                </div>
+            
+            
+                <!-- 回到顶部的按钮-->  
+                <div class="progress-wrap shadow-drop-2-bottom">
+                    <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+                        <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"/>
+                    </svg>
+                </div>
+            
+            
+                <!-- 返回的按钮-->  
+                <div class="return-to-last-progress-wrap shadow-drop-2-bottom">
+                    <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+                        <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"/>
+                    </svg>
+                </div>
+            
+    </body>
+</html>
