@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="cn">
+    
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport" />
+    <meta name="description" content="CMake教程（二）：CMake流程控制与依赖管理" />
+    <meta name="hexo-theme-A4" content="v1.9.6" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.jpg">
+    <title>Cz | A Chinese coder now living in SG</title>
+
+    
+        
+<link rel="stylesheet" href="/css/highlight/style1.css">
+
+        
+<link rel="stylesheet" href="/css/reset.css">
+
+        
+<link rel="stylesheet" href="/css/markdown.css">
+
+        
+<link rel="stylesheet" href="/css/fonts.css">
+ 
+         <!--注意：首页既不是post也不是page-->
+        
+            
+<link rel="stylesheet" href="/css/waline.css">
+
+        
+        
+        
+<link rel="stylesheet" href="/css/ui.css">
+ 
+        
+<link rel="stylesheet" href="/css/style.css">
+
+
+        
+            <!--返回顶部css-->
+            
+<link rel="stylesheet" href="/css/returnToTop.css">
+
+            
+<link rel="stylesheet" href="/css/unicons.css">
+
+        
+        
+            <!--目录-->
+            
+<link rel="stylesheet" href="/css/toc.css">
+
+        
+    
+
+    
+        
+<link rel="stylesheet" href="/css/returnToLastPage.css">
+
+    
+    
+   
+<link rel="stylesheet" href="/css/lightgallery-bundle.min.css">
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+    
+    
+
+    
+    
+
+
+
+    
+
+    
+    
+
+    
+    
+    
+    <body>
+        <script src="/js/darkmode-js.min.js"></script>
+        
+        <script>
+            const options = {
+                bottom: '40px', // default: '32px'
+                right: 'unset', // default: '32px'
+                left: '42px', // default: 'unset'
+                time: '0.3s', // default: '0.3s'
+                mixColor: '#fff', // default: '#fff'
+                backgroundColor: ' #e4e4e4 ',  // default: '#fff'
+                buttonColorDark: '#100f2c',  // default: '#100f2c'
+                buttonColorLight: '#fff', // default: '#fff'
+                saveInCookies: true, // default: true,
+                label: '🌓', // default: ''
+                autoMatchOsTheme: true // default: true
+            }
+            const darkmode = new Darkmode(options);
+            darkmode.showWidget();
+        </script>
+        
+        
+            <div class="left-toc-container">
+                <nav id="toc" class="bs-docs-sidebar"></nav>
+            </div>
+        
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+
+
+<div class="header">
+    <div class="header-container">
+        <style>
+            .header-img {
+                width: 56px;
+                height: auto;
+                object-fit: cover; /* 保持图片比例 */
+                transition: transform 0.3s ease-in-out; 
+                border-radius: 50%; 
+            }
+            
+        </style>
+        <img 
+            alt="^-^" 
+            cache-control="max-age=86400" 
+            class="header-img" 
+            src="/img/favicon.jpg" 
+        />
+        <div class="header-content">
+            <a class="logo" href="/">Cz</a> 
+            <span class="description">#define ME &#34;A coder&#34;</span> 
+        </div>
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">🏃主页</a></li>
+            
+        
+            
+                <li><a href="/list/">🖋️文章</a></li>
+            
+        
+            
+                <li><a href="/tags/">📌标签</a></li>
+            
+        
+            
+                <li><a href="/categories/">🔖分类</a></li>
+            
+        
+            
+                <li><a href="/about/">🙈关于</a></li>
+            
+        
+            
+                <li><a href="/now/">📆碎片</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+    
+
+    
+        
+            
+                <div class="post-main-title" style="text-align: center;">
+                    CMake教程（二）：CMake流程控制与依赖管理
+                </div>
+            
+        
+      
+    
+
+    
+
+        
+            <div class="post-head-meta-center">
+        
+                
+                    <span>最近更新：2025-01-24</span> 
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                     <span>字数总计：5.3k</span>
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                    <span>阅读估时：21分钟</span>
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                    <span id="busuanzi_container_page_pv">
+                        阅读量：<span id="busuanzi_value_page_pv"></span>次
+                    </span>
+                
+            </div>
+    
+
+    <div class="post-md">
+        
+            
+        
+        <div class=".article-gallery"><h2 id="1-变量操作"><a href="#1-变量操作" class="headerlink" title="1. 变量操作"></a>1. 变量操作</h2><h3 id="1-1-追加"><a href="#1-1-追加" class="headerlink" title="1.1 追加"></a>1.1 追加</h3><p>上一篇文章中我们讨论了多文件管理，但有时候项目的源文件并不一定都在同一个目录中，这些源文件最终却需要一起进行编译来生成最终的可执行文件或者库文件。我们可以通过<code>file</code>命令对各个目录下的源文件进行搜索，最后再将得到的文件名做一个字符串拼接的操作即可(使用<code>set</code>命令或<code>list</code>命令)。文件搜索详见下一章节。</p>
+<h4 id="1-1-1-使用set拼接"><a href="#1-1-1-使用set拼接" class="headerlink" title="1.1.1 使用set拼接"></a>1.1.1 使用set拼接</h4><p>如果使用<code>set</code>进行字符串拼接，对应的命令格式如下：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(变量名<span class="number">1</span> <span class="variable">$&#123;变量名1&#125;</span> <span class="variable">$&#123;变量名2&#125;</span> ...)</span><br></pre></td></tr></table></figure>
+<p>关于上面的命令其实就是将从第二个参数开始往后所有的字符串进行拼接，最后将结果存储到第一个参数中，如果第一个参数中原来有数据会对原数据就行覆盖。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.0</span>)</span><br><span class="line"><span class="keyword">project</span>(<span class="keyword">TEST</span>)</span><br><span class="line"><span class="keyword">set</span>(TEMP <span class="string">&quot;hello,world&quot;</span>)</span><br><span class="line"><span class="keyword">file</span>(GLOB SRC_1 <span class="variable">$&#123;PROJECT_SOURCE_DIR&#125;</span>/src1/*.cpp)</span><br><span class="line"><span class="keyword">file</span>(GLOB SRC_2 <span class="variable">$&#123;PROJECT_SOURCE_DIR&#125;</span>/src2/*.cpp)</span><br><span class="line"><span class="comment"># 追加(拼接)</span></span><br><span class="line"><span class="keyword">set</span>(SRC_1 <span class="variable">$&#123;SRC_1&#125;</span> <span class="variable">$&#123;SRC_2&#125;</span> <span class="variable">$&#123;TEMP&#125;</span>)</span><br><span class="line"><span class="keyword">message</span>(STATUS <span class="string">&quot;message: $&#123;SRC_1&#125;&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-1-2-使用list拼接"><a href="#1-1-2-使用list拼接" class="headerlink" title="1.1.2 使用list拼接"></a>1.1.2 使用list拼接</h4><p>如果使用<code>list</code>进行字符串拼接，对应的命令格式如下：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">list</span>(APPEND &lt;<span class="keyword">list</span>&gt; [&lt;element&gt; ...])</span><br></pre></td></tr></table></figure>
+<p><code>list</code>命令的功能比<code>set</code>要强大，字符串拼接只是它的其中一个功能，所以需要在它第一个参数的位置指定出我们要做的操作，<code>APPEND</code>表示进行数据追加，后边的参数和<code>set</code>一样。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.0</span>)</span><br><span class="line"><span class="keyword">project</span>(<span class="keyword">TEST</span>)</span><br><span class="line"><span class="keyword">set</span>(TEMP <span class="string">&quot;hello,world&quot;</span>)</span><br><span class="line"><span class="keyword">file</span>(GLOB SRC_1 <span class="variable">$&#123;PROJECT_SOURCE_DIR&#125;</span>/src1/*.cpp)</span><br><span class="line"><span class="keyword">file</span>(GLOB SRC_2 <span class="variable">$&#123;PROJECT_SOURCE_DIR&#125;</span>/src2/*.cpp)</span><br><span class="line"><span class="comment"># 追加(拼接)</span></span><br><span class="line"><span class="keyword">list</span>(APPEND SRC_1 <span class="variable">$&#123;SRC_1&#125;</span> <span class="variable">$&#123;SRC_2&#125;</span> <span class="variable">$&#123;TEMP&#125;</span>)</span><br><span class="line"><span class="keyword">message</span>(STATUS <span class="string">&quot;message: $&#123;SRC_1&#125;&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>在<code>CMake</code>中，使用<code>set</code>命令可以创建一个<code>list</code>。一个在<code>list</code>内部是一个由分号<code>;</code>分割的一组字符串。例如，<code>set(var a b c d e)</code>命令将会创建一个<code>list:a;b;c;d;e</code>，但是最终打印变量值的时候得到的是<code>abcde</code>。</p>
+<h3 id="1-2-字符串移除"><a href="#1-2-字符串移除" class="headerlink" title="1.2 字符串移除"></a>1.2 字符串移除</h3><p>在上面的例子中，我们通过<code>file</code>搜索某个目录就得到了该目录下所有的源文件，但是其中有些源文件并不是我们所需要的，比如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">project/</span><br><span class="line">├── main.cpp</span><br><span class="line">├── helper1.cpp</span><br><span class="line">├── helper2.cpp</span><br><span class="line">└── CMakeLists.txt</span><br></pre></td></tr></table></figure>
+<p>在当前目录有三个源文件，其中main.cpp是一个测试文件。如果我们想要把相关的源文件生成一个动态库给别人使用，那么只需要helper1.cpp、helper2.cpp这两个源文件就可以了。此时，就需要将main.cpp从搜索到的数据中剔除出去。想要实现这个功能，也可以使用<code>list</code>：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">list</span>(REMOVE_ITEM &lt;<span class="keyword">list</span>&gt; &lt;value&gt; [&lt;value&gt; ...])</span><br></pre></td></tr></table></figure>
+<p>通过上面的命令原型可以看到删除和追加数据类似，只不过是第一个参数变成了<code>REMOVE_ITEM</code>。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.0</span>)</span><br><span class="line"><span class="keyword">project</span>(<span class="keyword">TEST</span>)</span><br><span class="line"><span class="keyword">set</span>(TEMP <span class="string">&quot;hello,world&quot;</span>)</span><br><span class="line"><span class="keyword">file</span>(GLOB SRC_1 <span class="variable">$&#123;PROJECT_SOURCE_DIR&#125;</span>/*.cpp)</span><br><span class="line"><span class="comment"># 移除前日志</span></span><br><span class="line"><span class="keyword">message</span>(STATUS <span class="string">&quot;message: $&#123;SRC_1&#125;&quot;</span>)</span><br><span class="line"><span class="comment"># 移除 main.cpp</span></span><br><span class="line"><span class="keyword">list</span>(REMOVE_ITEM SRC_1 <span class="variable">$&#123;PROJECT_SOURCE_DIR&#125;</span>/main.cpp)</span><br><span class="line"><span class="comment"># 移除后日志</span></span><br><span class="line"><span class="keyword">message</span>(STATUS <span class="string">&quot;message: $&#123;SRC_1&#125;&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>关于<code>list</code>的其他操作，详见<a target="_blank" rel="noopener" href="https://cmake.org/cmake/help/latest/command/list.html"><code>list</code></a>官方文档。</p>
+<h2 id="2-文件搜索"><a href="#2-文件搜索" class="headerlink" title="2. 文件搜索"></a>2. 文件搜索</h2><p>上一篇文章中我们讨论了多文件管理，使用<code>set</code>命令将目录下的所有源文件设置为变量。但有时我们在编写<code>CMakeLists.txt</code>时，一一罗列耗时且容易出现错误，<code>CMake</code>提供了<code>aux_source_directory</code>和<code>file</code>命令，帮助我们搜索文件，避免手动输入。</p>
+<h3 id="2-1-aux-source-directory"><a href="#2-1-aux-source-directory" class="headerlink" title="2.1 aux_source_directory"></a>2.1 aux_source_directory</h3><p>在 CMake 中使用aux_source_directory 命令可以查找某个路径下的所有源文件，命令格式为：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">aux_source_directory</span>(&lt;dir&gt; &lt;variable&gt;)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>dir</code>：要搜索的目录</li>
+<li><code>variable</code>：将从<code>dir</code>目录下搜索到的源文件列表存储到该变量中</li>
+</ul>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.0</span>)</span><br><span class="line"><span class="keyword">project</span>(MyProject)</span><br><span class="line"><span class="keyword">include_directories</span>(<span class="variable">$&#123;PROJECT_SOURCE_DIR&#125;</span>/<span class="keyword">include</span>)</span><br><span class="line"><span class="comment"># 搜索 src 目录下的源文件</span></span><br><span class="line"><span class="keyword">aux_source_directory</span>(<span class="variable">$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;</span>/src SRC_LIST)</span><br><span class="line"><span class="keyword">add_executable</span>(hello <span class="variable">$&#123;SRC_LIST&#125;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-file"><a href="#2-2-file" class="headerlink" title="2.2 file"></a>2.2 file</h3><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">file</span>(GLOB/GLOB_RECURSE 变量名 要搜索的文件路径和文件类型)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>GLOB</code>: 将指定目录下搜索到的满足条件的所有文件名生成一个列表，并将其存储到变量中。</li>
+<li><code>GLOB_RECURSE</code>：递归搜索指定目录，将搜索到的满足条件的文件名生成一个列表，并将其存储到变量中。</li>
+</ul>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.0</span>)</span><br><span class="line"><span class="keyword">project</span>(MyProject)</span><br><span class="line"></span><br><span class="line"><span class="keyword">file</span>(GLOB MAIN_SRC <span class="variable">$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;</span>/src/*.cpp)</span><br><span class="line"><span class="keyword">file</span>(GLOB MAIN_HEAD <span class="variable">$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;</span>/<span class="keyword">include</span>/*.h)</span><br><span class="line"><span class="comment"># 关于要搜索的文件路径和类型可加双引号，也可不加:</span></span><br><span class="line"><span class="keyword">file</span>(GLOB MAIN_HEAD2 <span class="string">&quot;$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;/include/*.h&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">add_executable</span>(hello <span class="variable">$&#123;MAIN_SRC&#125;</span>)</span><br></pre></td></tr></table></figure>
+<p><code>CMAKE_CURRENT_SOURCE_DIR</code>宏表示当前访问的<code>CMakeLists.txt</code>文件所在的路径。</p>
+<h2 id="3-流程控制"><a href="#3-流程控制" class="headerlink" title="3. 流程控制"></a>3. 流程控制</h2><p>当项目变得复杂时，<code>CMake</code>需要根据不同的条件做出选择。为此，<code>CMake</code>提供流程控制语法，可以像<code>shell</code>脚本一样进行<code>条件判断</code>和<code>循环</code>。</p>
+<h3 id="3-1-条件判断"><a href="#3-1-条件判断" class="headerlink" title="3.1 条件判断"></a>3.1 条件判断</h3><p>条件判断语法格式如下：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(&lt;condition&gt;)</span><br><span class="line">    &lt;<span class="keyword">command</span>&gt;</span><br><span class="line"><span class="keyword">elseif</span>(&lt;condition&gt;) <span class="comment"># optional，可重复</span></span><br><span class="line">    &lt;<span class="keyword">command</span>&gt;</span><br><span class="line"><span class="keyword">else</span>()              <span class="comment"># optional</span></span><br><span class="line">    &lt;<span class="keyword">command</span>&gt;</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure>
+<p>在进行条件判断的时候，如果有多个条件，可以写多个<code>elseif</code>，最后一个条件可以使用<code>else</code>。但是开始和结束必须成对出现，分别为<code>if</code>和<code>endif</code>。</p>
+<h4 id="3-1-1-基本条件表达式"><a href="#3-1-1-基本条件表达式" class="headerlink" title="3.1.1 基本条件表达式"></a>3.1.1 基本条件表达式</h4><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(&lt;expression&gt;)</span><br></pre></td></tr></table></figure>
+<p>如果是基本表达式，<code>expression</code>有以下三种情况：<code>常量</code>、<code>变量</code>、<code>字符串</code>。</p>
+<ul>
+<li>如果是<code>1</code>，<code>ON</code>，<code>YES</code>，<code>TRUE</code>，<code>Y</code>，<code>非零值</code>，<code>非空字符串</code>时，条件判断返回<code>True</code></li>
+<li>如果是<code>0</code>，<code>OFF</code>，<code>NO</code>，<code>FALSE</code>，<code>N</code>，<code>IGNORE</code>，<code>NOTFOUND</code>，<code>空字符串</code>时，条件判断返回<code>False</code></li>
+</ul>
+<h4 id="3-1-2-逻辑判断"><a href="#3-1-2-逻辑判断" class="headerlink" title="3.1.2 逻辑判断"></a>3.1.2 逻辑判断</h4><ul>
+<li><code>NOT</code>：取反操作，条件<code>condition</code>为<code>True</code>则返回<code>False</code>，条件<code>condition</code>为<code>False</code>则返回<code>True</code></li>
+</ul>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="keyword">NOT</span> &lt;condition&gt;)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>AND</code>：与操作，条件<code>cond1</code>和<code>cond2</code>同时为<code>True</code>则返回<code>True</code>，否则返回<code>False</code></li>
+</ul>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(&lt;cond1&gt; <span class="keyword">AND</span> &lt;cond2&gt;)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>OR</code>：或操作，条件<code>cond1</code>和<code>cond2</code>至少一个为<code>True</code>则返回<code>True</code>，如果两个条件均为<code>False</code>则返回<code>False</code></li>
+</ul>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(&lt;cond1&gt; <span class="keyword">OR</span> &lt;cond2&gt;)</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-1-3-比较"><a href="#3-1-3-比较" class="headerlink" title="3.1.3 比较"></a>3.1.3 比较</h4><h5 id="1-基于数值的比较"><a href="#1-基于数值的比较" class="headerlink" title="(1) 基于数值的比较"></a>(1) 基于数值的比较</h5><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(&lt;variable|<span class="keyword">string</span>&gt; <span class="keyword">LESS</span> &lt;variable|<span class="keyword">string</span>&gt;)</span><br><span class="line"><span class="keyword">if</span>(&lt;variable|<span class="keyword">string</span>&gt; <span class="keyword">GREATER</span> &lt;variable|<span class="keyword">string</span>&gt;)</span><br><span class="line"><span class="keyword">if</span>(&lt;variable|<span class="keyword">string</span>&gt; <span class="keyword">EQUAL</span> &lt;variable|<span class="keyword">string</span>&gt;)</span><br><span class="line"><span class="keyword">if</span>(&lt;variable|<span class="keyword">string</span>&gt; <span class="keyword">LESS_EQUAL</span> &lt;variable|<span class="keyword">string</span>&gt;)</span><br><span class="line"><span class="keyword">if</span>(&lt;variable|<span class="keyword">string</span>&gt; <span class="keyword">GREATER_EQUAL</span> &lt;variable|<span class="keyword">string</span>&gt;)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>LESS</code>：如果左侧数值<code>小于</code>右侧，返回<code>True</code></li>
+<li><code>GREATER</code>：如果左侧数值<code>大于</code>右侧，返回<code>True</code></li>
+<li><code>EQUAL</code>：如果左侧数值<code>等于</code>右侧，返回<code>True</code></li>
+<li><code>LESS_EQUAL</code>：如果左侧数值<code>小于等于</code>右侧，返回<code>True</code></li>
+<li><code>GREATER_EQUAL</code>：如果左侧数值<code>大于等于</code>右侧，返回<code>True</code></li>
+</ul>
+<h5 id="2-基于字符串的比较"><a href="#2-基于字符串的比较" class="headerlink" title="(2) 基于字符串的比较"></a>(2) 基于字符串的比较</h5><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(&lt;variable|<span class="keyword">string</span>&gt; <span class="keyword">STRLESS</span> &lt;variable|<span class="keyword">string</span>&gt;)</span><br><span class="line"><span class="keyword">if</span>(&lt;variable|<span class="keyword">string</span>&gt; <span class="keyword">STRGREATER</span> &lt;variable|<span class="keyword">string</span>&gt;)</span><br><span class="line"><span class="keyword">if</span>(&lt;variable|<span class="keyword">string</span>&gt; <span class="keyword">STREQUAL</span> &lt;variable|<span class="keyword">string</span>&gt;)</span><br><span class="line"><span class="keyword">if</span>(&lt;variable|<span class="keyword">string</span>&gt; <span class="keyword">STRLESS_EQUAL</span> &lt;variable|<span class="keyword">string</span>&gt;)</span><br><span class="line"><span class="keyword">if</span>(&lt;variable|<span class="keyword">string</span>&gt; <span class="keyword">STRGREATER_EQUAL</span> &lt;variable|<span class="keyword">string</span>&gt;)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>STRLESS</code>：如果左侧字符串<code>小于</code>右侧，返回<code>True</code></li>
+<li><code>STRGREATER</code>：如果左侧字符串<code>大于</code>右侧，返回<code>True</code></li>
+<li><code>STREQUAL</code>：如果左侧字符串<code>等于</code>右侧，返回<code>True</code></li>
+<li><code>STRLESS_EQUAL</code>：如果左侧字符串<code>小于等于</code>右侧，返回<code>True</code></li>
+<li><code>STRGREATER_EQUAL</code>：如果左侧字符串<code>大于等于</code>右侧，返回<code>True</code></li>
+</ul>
+<h4 id="3-1-4-文件操作"><a href="#3-1-4-文件操作" class="headerlink" title="3.1.4 文件操作"></a>3.1.4 文件操作</h4><ol>
+<li>判断文件或者目录是否存在，存在则返回<code>True</code>，否则返回<code>False</code></li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="keyword">EXISTS</span> path-to-<span class="keyword">file</span>-<span class="keyword">or</span>-directory)</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>判断是否是目录，<u>此处目录的<code>path</code>必须是绝对路径</u>。目录存在则返回<code>True</code>，否则返回<code>False</code></li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="keyword">IS_DIRECTORY</span> path)</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>判断是否是软链接，<u>此处<code>file-name</code>对应的路径必须是绝对路径</u>。软链接存在则返回<code>True</code>，否则返回<code>False</code></li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="keyword">IS_SYMLINK</span> <span class="keyword">file</span>-name)</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>判断是否是绝对路径</li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="keyword">IS_ABSOLUTE</span> path)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>关于绝对路径：<ul>
+<li>如果是<code>Linux</code>，该路径需要从根目录开始描述</li>
+<li>如果是<code>Windows</code>，该路径需要从盘符开始描述</li>
+</ul>
+</li>
+<li>如果是绝对路径返回<code>True</code>，否则返回<code>False</code></li>
+</ul>
+<h4 id="3-1-5-其他"><a href="#3-1-5-其他" class="headerlink" title="3.1.5 其他"></a>3.1.5 其他</h4><ol>
+<li>判断某个元素是否在列表中。<u><code>CMake</code>版本要求<code>&gt;=3.3</code></u>，元素在列表中返回<code>True</code>，否则返回<code>False</code></li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(&lt;variable|<span class="keyword">string</span>&gt; <span class="keyword">IN_LIST</span> &lt;variable&gt;)</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>判断两个路径是否相等。<u><code>CMake</code>版本要求<code>&gt;=3.4</code></u>，路径相等返回<code>True</code>，否则返回<code>False</code></li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(&lt;variable|<span class="keyword">string</span>&gt; PATH_EQUAL &lt;variable&gt;)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 路径比较与字符串比较等价，如果路径格式书写没有问题也可以通过下面这种方式进行比较：</span></span><br><span class="line"><span class="keyword">if</span>(&lt;variable|<span class="keyword">string</span>&gt; <span class="keyword">STREQUAL</span> &lt;variable&gt;)</span><br><span class="line"></span><br><span class="line"><span class="comment">#[[我们在书写某个路径的时候，可能由于误操作会多写几个分隔符，比如把`/a/b/c`写成`/a//b///c`</span></span><br><span class="line"><span class="comment">   在进行路径比较的时候，如果使用 PATH_EQUAL 可以自动剔除路径中多余的分割线然后再进行路径的对比</span></span><br><span class="line"><span class="comment">   使用 STREQUAL 则只能进行字符串比较。比如：</span></span><br><span class="line"><span class="comment">]]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(<span class="string">&quot;/home//frodocz///Linux&quot;</span> PATH_EQUAL <span class="string">&quot;/home/frodocz/Linux&quot;</span>)</span><br><span class="line">    <span class="keyword">message</span>(<span class="string">&quot;same path&quot;</span>)</span><br><span class="line"><span class="keyword">else</span>()</span><br><span class="line">    <span class="keyword">message</span>(<span class="string">&quot;different path&quot;</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">message</span>(STATUS <span class="string">&quot;=============&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(<span class="string">&quot;/home//frodocz///Linux&quot;</span> <span class="keyword">STREQUAL</span> <span class="string">&quot;/home/frodocz/Linux&quot;</span>)</span><br><span class="line">    <span class="keyword">message</span>(<span class="string">&quot;same path&quot;</span>)</span><br><span class="line"><span class="keyword">else</span>()</span><br><span class="line">    <span class="keyword">message</span>(<span class="string">&quot;different path&quot;</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure>
+
+<p>输出日志信息如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">same path</span><br><span class="line">=============</span><br><span class="line">different path</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://cmake.org/cmake/help/latest/command/if.html">更多关于<code>if</code>的条件判断请参考官方文档</a></p>
+<h3 id="3-2-循环"><a href="#3-2-循环" class="headerlink" title="3.2 循环"></a>3.2 循环</h3><p>在<code>CMake</code>中循环有两种方式，分别是：<code>foreach</code>和<code>while</code>。</p>
+<h4 id="3-2-1-foreach"><a href="#3-2-1-foreach" class="headerlink" title="3.2.1 foreach"></a>3.2.1 foreach</h4><p>使用foreach循环，语法格式如下：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">foreach</span>(&lt;loop_var&gt; &lt;items&gt;)</span><br><span class="line">    &lt;commands&gt;</span><br><span class="line"><span class="keyword">endforeach</span>()</span><br></pre></td></tr></table></figure>
+<p>通过<code>foreach</code>我们可以对<code>items</code>中的数据进行遍历，然后通过<code>loop_var</code>将遍历到的当前的值取出，在取值的时候有以下几种用法：</p>
+<h5 id="方法（1）"><a href="#方法（1）" class="headerlink" title="方法（1）"></a>方法（1）</h5><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">foreach</span>(&lt;loop_var&gt; RANGE &lt;stop&gt;)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 比如</span></span><br><span class="line"><span class="keyword">foreach</span>(item RANGE <span class="number">5</span>)</span><br><span class="line">    <span class="keyword">message</span>(STATUS <span class="string">&quot;current iteration: $&#123;item&#125;&quot;</span> )</span><br><span class="line"><span class="keyword">endforeach</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line">current iteration: <span class="number">0</span></span><br><span class="line">current iteration: <span class="number">1</span></span><br><span class="line">current iteration: <span class="number">2</span></span><br><span class="line">current iteration: <span class="number">3</span></span><br><span class="line">current iteration: <span class="number">4</span></span><br><span class="line">current iteration: <span class="number">5</span></span><br></pre></td></tr></table></figure>
+<p><u>在对一个整数区间进行遍历的时候，得到的范围是闭区间<code>[0，stop]</code>，步长为<code>1</code>。</u></p>
+<h5 id="方法（2）"><a href="#方法（2）" class="headerlink" title="方法（2）"></a>方法（2）</h5><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">foreach</span>(&lt;loop_var&gt; RANGE &lt;start&gt; &lt;stop&gt; [&lt;step&gt;])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 比如</span></span><br><span class="line"><span class="keyword">foreach</span>(item RANGE <span class="number">10</span> <span class="number">30</span> <span class="number">5</span>)</span><br><span class="line">    <span class="keyword">message</span>(STATUS <span class="string">&quot;current iteration: $&#123;item&#125;&quot;</span> )</span><br><span class="line"><span class="keyword">endforeach</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line">current iteration: <span class="number">10</span></span><br><span class="line">current iteration: <span class="number">15</span></span><br><span class="line">current iteration: <span class="number">20</span></span><br><span class="line">current iteration: <span class="number">25</span></span><br><span class="line">current iteration: <span class="number">30</span></span><br></pre></td></tr></table></figure>
+<p><u>指定整数闭区间范围<code>[start, end]</code>，并指定步长<code>step</code>(默认<code>1</code>，可不设置)</u></p>
+<h5 id="方法（3）"><a href="#方法（3）" class="headerlink" title="方法（3）"></a>方法（3）</h5><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">foreach</span>(&lt;loop_var&gt; IN [LISTS [&lt;lists&gt;]] [ITEMS [&lt;items&gt;]])</span><br></pre></td></tr></table></figure>
+<p>这是<code>foreach</code>的另一个变体，通过这种方式我们可以对更加复杂的数据进行遍历，前两种方式只适用于对某个正整数范围内的遍历。</p>
+<ul>
+<li><code>IN</code>：关键字，表示在<code>LISTS/ITEMS</code>里</li>
+<li><code>LISTS</code>：关键字，对应的是列表<code>list</code>，可通过<code>set</code>、<code>list</code>获得</li>
+<li><code>ITEMS</code>：关键字，对应的也是<code>list</code></li>
+<li><code>loop_var</code>：存储每次循环取出的值</li>
+</ul>
+<p>例(1): 使用<code>LISTS</code>关键字遍历</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(WORD a b c <span class="string">&quot;d e f&quot;</span>)</span><br><span class="line"><span class="keyword">set</span>(NAME zhang chao frodo)</span><br><span class="line"></span><br><span class="line"><span class="comment"># list遍历</span></span><br><span class="line"><span class="keyword">foreach</span>(item IN LISTS WORD NAME)</span><br><span class="line">    <span class="keyword">message</span>(STATUS <span class="string">&quot;current value: $&#123;item&#125;&quot;</span> )</span><br><span class="line"><span class="keyword">endforeach</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line">current value: a</span><br><span class="line">current value: b</span><br><span class="line">current value: c</span><br><span class="line">current value: d e f</span><br><span class="line">current value: zhang</span><br><span class="line">current value: chao</span><br><span class="line">current value: frodo</span><br></pre></td></tr></table></figure>
+
+<p>例(2): 使用<code>ITEMS</code>关键字遍历</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(WORD a b c <span class="string">&quot;d e f&quot;</span>)</span><br><span class="line"><span class="keyword">set</span>(NAME zhang chao frodo)</span><br><span class="line"></span><br><span class="line"><span class="comment"># list遍历</span></span><br><span class="line"><span class="keyword">foreach</span>(item IN ITEMS <span class="variable">$&#123;WORD&#125;</span> <span class="variable">$&#123;NAME&#125;</span>)</span><br><span class="line">    <span class="keyword">message</span>(STATUS <span class="string">&quot;current value: $&#123;item&#125;&quot;</span> )</span><br><span class="line"><span class="keyword">endforeach</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line">current value: a</span><br><span class="line">current value: b</span><br><span class="line">current value: c</span><br><span class="line">current value: d e f</span><br><span class="line">current value: zhang</span><br><span class="line">current value: chao</span><br><span class="line">current value: frodo</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>ITEMS</code>与<code>LISTS</code>的区别在于需要通过<code>$&#123;&#125;</code>将列表中的值取出</li>
+<li><u>通过<code>set</code>组织列表的时候，如果某个字符串中有空格，需要通过双引号将其包裹起来</u></li>
+</ul>
+<h5 id="方法4"><a href="#方法4" class="headerlink" title="方法4"></a>方法4</h5><p><u>要求<code>CMake</code>版本<code>&gt;=3.17</code></u></p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">foreach</span>(&lt;loop_var&gt;... IN ZIP_LISTS &lt;lists&gt;)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>loop_var</code>：存储每次循环取出的值，可以根据要遍历的列表的数量指定多个变量，用于存储对应的列表当前取出的那个值<ul>
+<li>如果指定了<u>多个变量名，它们的数量应等于要遍历的列表数量</u></li>
+<li>如果只给出了一个<code>loop_var</code>，那么它将一系列的<code>loop_var_N</code>变量来存储对应列表中的当前项，也就是说**<code>loop_var_0</code>对应第一个列表**，<code>loop_var_1</code>对应第二个列表，以此类推…</li>
+<li>如果遍历的多个列表中一个列表较短，当它遍历完成之后将不会再参与后续的遍历（因为其它列表还没有遍历完）</li>
+</ul>
+</li>
+<li><code>ZIP_LISTS</code>：关键字，对应的是列表<code>list</code>，通过<code>set</code>、<code>list</code>可以获得</li>
+</ul>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.17</span>)</span><br><span class="line"><span class="keyword">project</span>(<span class="keyword">test</span>)</span><br><span class="line"><span class="comment"># 通过list给列表添加数据</span></span><br><span class="line"><span class="keyword">list</span>(APPEND WORD hello world <span class="string">&quot;hello world&quot;</span>)</span><br><span class="line"><span class="keyword">list</span>(APPEND NAME zhang chao frodo cz)</span><br><span class="line"><span class="comment"># 遍历列表</span></span><br><span class="line"><span class="keyword">foreach</span>(item1 item2 IN ZIP_LISTS WORD NAME)</span><br><span class="line">    <span class="keyword">message</span>(STATUS <span class="string">&quot;current iteration: item1 = $&#123;item1&#125;, item2 = $&#123;item2&#125;&quot;</span> )</span><br><span class="line"><span class="keyword">endforeach</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">message</span>(<span class="string">&quot;=============================&quot;</span>)</span><br><span class="line"><span class="comment"># 遍历列表</span></span><br><span class="line"><span class="keyword">foreach</span>(item  IN ZIP_LISTS WORD NAME)</span><br><span class="line">    <span class="keyword">message</span>(STATUS <span class="string">&quot;current iteration: item1 = $&#123;item_0&#125;, item2 = $&#123;item_1&#125;&quot;</span> )</span><br><span class="line"><span class="keyword">endforeach</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line">current iteration: item1 = hello, item2 = zhang</span><br><span class="line">current iteration: item1 = world, item2 = chao</span><br><span class="line">current iteration: item1 = hello world, item2 = frodo</span><br><span class="line">current iteration: item1 = , item2 = cz</span><br><span class="line">=============================</span><br><span class="line">current iteration: item1 = hello, item2 = zhang</span><br><span class="line">current iteration: item1 = world, item2 = chao</span><br><span class="line">current iteration: item1 = hello world, item2 = frodo</span><br><span class="line">current iteration: item1 = , item2 = cz</span><br></pre></td></tr></table></figure>
+
+<p><code>foreach</code>循环特别适合用来遍历一个列表。假设你有一堆源文件，想要对每个文件做一些操作，比如打印文件名，或者设置编译选项。<code>foreach</code>可以帮你自动遍历这些文件，逐个处理。</p>
+<h4 id="3-2-2-while"><a href="#3-2-2-while" class="headerlink" title="3.2.2 while"></a>3.2.2 while</h4><p>除了使用<code>foreach</code>也可以使用<code>while</code>循环，关于循环结束对应的条件判断的书写格式和<code>if/elseif</code>是一样的。<code>while</code>的语法格式如下：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span>(&lt;condition&gt;)</span><br><span class="line">    &lt;commands&gt;</span><br><span class="line"><span class="keyword">endwhile</span>()</span><br></pre></td></tr></table></figure>
+<p><code>while</code>循环比较简单，只要指定循环结束条件，根据一个条件反复执行，直到条件不再满足为止：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.5</span>)</span><br><span class="line"><span class="keyword">project</span>(<span class="keyword">test</span>)</span><br><span class="line"><span class="comment"># 创建一个列表 NAME</span></span><br><span class="line"><span class="keyword">set</span>(NAME zhang chao frodo cz)</span><br><span class="line"><span class="comment"># 得到列表长度</span></span><br><span class="line"><span class="keyword">list</span>(LENGTH NAME LEN)</span><br><span class="line"><span class="comment"># 循环</span></span><br><span class="line"><span class="keyword">while</span>(<span class="variable">$&#123;LEN&#125;</span> <span class="keyword">GREATER</span> <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">message</span>(STATUS <span class="string">&quot;names = $&#123;NAME&#125;, len = $&#123;LEN&#125;&quot;</span>)</span><br><span class="line">    <span class="comment"># 弹出列表头部元素</span></span><br><span class="line">    <span class="keyword">list</span>(POP_FRONT NAME)</span><br><span class="line">    <span class="comment"># 更新列表长度</span></span><br><span class="line">    <span class="keyword">list</span>(LENGTH NAME LEN)</span><br><span class="line"><span class="comment">#endwhile()</span></span><br></pre></td></tr></table></figure>
+<p>输出如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">names = zhang;chao;frodo;cz, len = 4</span><br><span class="line">names = chao;frodo;cz, len = 3</span><br><span class="line">names = frodo;cz, len = 2</span><br><span class="line">names = cz, len = 1</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-依赖管理"><a href="#4-依赖管理" class="headerlink" title="4. 依赖管理"></a>4. 依赖管理</h2><p>随着项目规模的增长，为了避免重复造轮子，难免会用到一些功能强大的外部依赖库，比如<code>Boost</code>、<code>protobuf</code>、<code>OpenCV</code>等。<code>CMake</code>提供了一系列工具链来解决第三方库的依赖管理。</p>
+<h3 id="4-1-查找和使用外部库"><a href="#4-1-查找和使用外部库" class="headerlink" title="4.1 查找和使用外部库"></a>4.1 查找和使用外部库</h3><p><code>CMake</code>提供<code>find_package()</code>命令，可以帮助用户找到所需的外部库，并配置好库的路径、头文件、库文件的链接。<br>比如我们希望引入<code>Boost</code>库，可以使用：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查找 Boost 库，要求版本 &gt;= 1.70</span></span><br><span class="line"><span class="keyword">find_package</span>(Boost <span class="number">1.70</span> REQUIRED)</span><br></pre></td></tr></table></figure>
+<p>这行代码告诉<code>CMake</code>：“寻找<code>Boost</code>库，版本至少是1.70，找不到的话就报错”。如果<code>CMake</code>成功找到了<code>Boost</code>，则自动设置一些变量，例如：</p>
+<ul>
+<li><code>Boost_INCLUDE_DIRS</code>：<code>Boost</code>的头文件路径</li>
+<li><code>Boost_LIBRARIES</code>：<code>Boost</code>的库文件路径<br>然后，你可以将这些信息传给<code>CMake</code>，当你的某个目标文件<code>my_target</code>需要用到<code>Boost</code>时：</li>
+</ul>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 告诉 CMake，my_target 需要使用 Boost 的头文件</span></span><br><span class="line"><span class="comment"># 把 Boost 的头文件路径加到编译器的搜索路径中，确保编译时能够找到 Boost 的头文件</span></span><br><span class="line"><span class="keyword">target_include_directories</span>(my_target PRIVATE <span class="variable">$&#123;Boost_INCLUDE_DIRS&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 告诉 CMake，my_target 需要链接 Boost 库</span></span><br><span class="line">把 Boost 的库文件链接到 my_target，确保生成的程序能正确链接到 Boost 库</span><br><span class="line"><span class="keyword">target_link_libraries</span>(my_target PRIVATE <span class="variable">$&#123;Boost_LIBRARIES&#125;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-自定义路径查找依赖库"><a href="#4-2-自定义路径查找依赖库" class="headerlink" title="4.2 自定义路径查找依赖库"></a>4.2 自定义路径查找依赖库</h3><p>在实际开发中，可能会遇到这种情况：某些库并没有安装在系统默认路径下(如<code>/usr/local/lib</code>或<code>/usr/lib</code>)，导致<code>find_package()</code>无法找到它们。此时我们需要告诉<code>CMake</code>去哪里寻找这些库。<br><code>find_package()</code>的默认查找顺序如下：</p>
+<ol>
+<li>用户指定的提示路径<ul>
+<li>如果在<code>find_package()</code>中使用了<code>HINTS</code>或<code>PATHS</code>参数，这些路径会被优先考虑。</li>
+</ul>
+</li>
+<li>全局配置的路径<ul>
+<li><code>CMAKE_PREFIX_PATH</code>：这是一个全局变量，可以通过命令行或<code>CMakeLists.txt</code>配置</li>
+<li>库支持的特定环境变量，如：<ul>
+<li><code>Boost</code>支持<code>BOOST_ROOT</code>环境变量；</li>
+<li><code>OpenCV</code>支持<code>OpenCV_DIR</code>环境变量。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>库自带的配置文件路径<blockquote>
+<p>如果库是使用<code>CMake</code>构建的，通常会自带<code>&lt;PackageName&gt;Config.cmake</code>或<code>&lt;lowercasename&gt;-config.cmake</code>文件，一般位于：</p>
+<ul>
+<li>库安装路径下的<code>lib/cmake/&lt;PackageName&gt;</code></li>
+<li>用户定义的安装目录<br><code>CMake</code>会根据这些配置文件提供的信息定位头文件和库文件。</li>
+</ul>
+</blockquote>
+</li>
+<li>标准系统路径<blockquote>
+<p>如果以上路径都找不到，CMake 会查找系统默认的库路径：</p>
+<ul>
+<li>Linux：<code>/usr/lib</code>，<code>/usr/local/lib</code>；</li>
+<li>macOS：<code>/opt/local/lib</code>，<code>/usr/local/lib</code>；</li>
+<li>Windows：<code>C:/Program Files/</code>，<code>C:/Program Files (x86)/</code>。</li>
+</ul>
+</blockquote>
+</li>
+</ol>
+<p>如果上述路径中都找不到符合要求的库，<code>CMake</code>会报错，停止配置过程。</p>
+<h3 id="4-3-CMake自定义路径示例"><a href="#4-3-CMake自定义路径示例" class="headerlink" title="4.3 CMake自定义路径示例"></a>4.3 CMake自定义路径示例</h3><h4 id="4-3-1-使用HINTS或PATHS提供路径提示"><a href="#4-3-1-使用HINTS或PATHS提供路径提示" class="headerlink" title="4.3.1 使用HINTS或PATHS提供路径提示"></a>4.3.1 使用<code>HINTS</code>或<code>PATHS</code>提供路径提示</h4><ul>
+<li><code>HINTS</code>：路径提示，提供额外查找路径，不改变默认搜索逻辑；</li>
+<li><code>PATHS</code>：明确路径，直接覆盖默认路径查找，<code>CMake</code>会优先在这些路径中查找。</li>
+</ul>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">find_package</span>(MyLib REQUIRED HINTS /custom/path/to/mylib)</span><br><span class="line">或</span><br><span class="line"><span class="keyword">find_package</span>(MyLib REQUIRED PATHS /custom/path/to/mylib)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (MyLib_FOUND) <span class="comment"># MyLib_FOUND 为 TRUE：表示成功找到 MyLib</span></span><br><span class="line">    <span class="keyword">target_include_directories</span>(my_target PRIVATE <span class="variable">$&#123;MyLib_INCLUDE_DIRS&#125;</span>)</span><br><span class="line">    <span class="keyword">target_link_libraries</span>(my_target PRIVATE <span class="variable">$&#123;MyLib_LIBRARIES&#125;</span>)</span><br><span class="line"><span class="keyword">else</span>()</span><br><span class="line">    <span class="keyword">message</span>(FATAL_ERROR <span class="string">&quot;MyLib not found!&quot;</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-3-2-设置CMAKE-PREFIX-PATH变量"><a href="#4-3-2-设置CMAKE-PREFIX-PATH变量" class="headerlink" title="4.3.2 设置CMAKE_PREFIX_PATH变量"></a>4.3.2 设置<code>CMAKE_PREFIX_PATH</code>变量</h4><p><code>CMAKE_PREFIX_PATH</code>是<code>CMake</code>的一个全局变量，它告诉<code>CMake</code>在标准路径之外，还要去哪些地方查找依赖库。你只需要把库所在的路径加到这个变量里，<code>find_package()</code>就能顺利找到它。</p>
+<ul>
+<li>通过命令行指定路径，在运行<code>CMake</code>时设置：</li>
+</ul>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 在 /custom/path/to/mylib 以及它的子目录中查找 MyLib，包括头文件和库文件</span></span><br><span class="line">cmake .. -DCMAKE_PREFIX_PATH=/custom/path/to/mylib</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果不想每次运行命令都指定路径，可以直接在<code>CMake</code>脚本里设置：</li>
+</ul>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(CMAKE_PREFIX_PATH <span class="string">&quot;/custom/path/to/mylib&quot;</span>)</span><br><span class="line"><span class="keyword">find_package</span>(MyLib REQUIRED)</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-3-3-使用find-path-查找头文件"><a href="#4-3-3-使用find-path-查找头文件" class="headerlink" title="4.3.3 使用find_path()查找头文件"></a>4.3.3 使用<code>find_path()</code>查找头文件</h4><p>当库没有提供Config.cmake时，<code>find_package()</code>将无法生效，这时候可以使用<code>find_path()</code>查找头文件：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">find_path</span>(MYLIB_INCLUDE_PATH NAMES mylib.h PATHS /custom/path/to/<span class="keyword">include</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>NAMES</code>：头文件名</li>
+<li><code>PATHS</code>：指定查找路径<br>如果找到，<code>MYLIB_INCLUDE_PATH</code>会保存头文件所在的目录，如<code>/custom/path/to/include</code>。</li>
+</ul>
+<h4 id="4-3-4-使用find-library-查找库文件"><a href="#4-3-4-使用find-library-查找库文件" class="headerlink" title="4.3.4 使用find_library()查找库文件"></a>4.3.4 使用<code>find_library()</code>查找库文件</h4><p>使用<code>find_library()</code>可以查找库文件，如<code>.so</code>（Linux）、<code>.a</code>（静态库）等。语法与<code>find_path()</code>类似：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">find_library</span>(MYLIB_PATH NAMES mylib PATHS /custom/path/to/lib)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>NAMES</code>：要找的库名，<code>CMake</code>会自动匹配后缀（如<code>.so</code>或<code>.a</code>）</li>
+<li><code>PATHS</code>：指定查找路径<br>如果找到，<code>MYLIB_PATH</code>会保存库文件的完整路径，如<code>/custom/path/to/lib/libmylib.so</code>。</li>
+</ul>
+<p>完整示例如下：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 找库和头文件</span></span><br><span class="line"><span class="keyword">find_library</span>(MYLIB_PATH NAMES mylib PATHS /custom/path/to/lib)</span><br><span class="line"><span class="keyword">find_path</span>(MYLIB_INCLUDE_PATH NAMES mylib.h PATHS /custom/path/to/<span class="keyword">include</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 检查是否找到</span></span><br><span class="line"><span class="keyword">if</span> (MYLIB_PATH <span class="keyword">AND</span> MYLIB_INCLUDE_PATH)</span><br><span class="line">    <span class="keyword">target_include_directories</span>(my_target PRIVATE <span class="variable">$&#123;MYLIB_INCLUDE_PATH&#125;</span>)</span><br><span class="line">    <span class="keyword">target_link_libraries</span>(my_target PRIVATE <span class="variable">$&#123;MYLIB_PATH&#125;</span>)</span><br><span class="line"><span class="keyword">else</span>()</span><br><span class="line">    <span class="keyword">message</span>(FATAL_ERROR <span class="string">&quot;Could not find mylib or its headers!&quot;</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-4-使用包管理器：vcpkg-和-Conan"><a href="#4-4-使用包管理器：vcpkg-和-Conan" class="headerlink" title="4.4 使用包管理器：vcpkg 和 Conan"></a>4.4 使用包管理器：vcpkg 和 Conan</h3><p>上文提到如何用<code>find_package()</code>找库，以及怎么设置自定义路径解决那些“找不到库”的问题。这个方法虽然好用，但总归还是有点麻烦，比如你得自己下载库，自己安装，还得知道库的路径在哪。随着项目依赖越来越多，常常会遇到以下问题：</p>
+<ul>
+<li>比如不同平台下，库的安装路径不一样，每次都要重新配置</li>
+<li>某些库需要去官网下载、解压、编译，耗时又费力</li>
+<li>团队里每个人的环境都不同，编译与调试时需要耗费很多时间与精力debug</li>
+</ul>
+<p><u><strong>包管理器</strong></u>可以帮我们自动下载、安装和配置好依赖库，甚至还能帮忙处理复杂的版本兼容问题。以下介绍两个流行的包管理器。</p>
+<h4 id="4-4-1-vcpkg"><a href="#4-4-1-vcpkg" class="headerlink" title="4.4.1 vcpkg"></a>4.4.1 <code>vcpkg</code></h4><p><code>vcpkg</code>是微软开源的跨平台包管理器，可以轻松安装管理各种C++库。以<code>OpenCV</code>为例，只需一个命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">安装 OpenCV 库</span></span><br><span class="line">vcpkg install opencv</span><br></pre></td></tr></table></figure>
+
+<p>安装完成后，只要在<code>CMakeLists.txt</code>中设置<code>vcpkg</code>的工具链文件路径，就可以像平常一样用<code>find_package()</code>来查找库：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 设置 vcpkg 的工具链文件</span></span><br><span class="line"><span class="keyword">set</span>(CMAKE_TOOLCHAIN_FILE <span class="string">&quot;path_to_vcpkg/scripts/buildsystems/vcpkg.cmake&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查找 OpenCV 库</span></span><br><span class="line"><span class="keyword">find_package</span>(OpenCV REQUIRED)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 链接到你的目标</span></span><br><span class="line"><span class="keyword">target_link_libraries</span>(my_target PRIVATE <span class="variable">$&#123;OpenCV_LIBS&#125;</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-4-2-Conan"><a href="#4-4-2-Conan" class="headerlink" title="4.4.2 Conan"></a>4.4.2 <code>Conan</code></h4><p><code>Conan</code>与<code>vcpkg</code>类似，但依赖于<code>Python 3.6</code>或更高版本。使用方法如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">pip install conan</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">验证 Conan 是否安装成功</span></span><br><span class="line">conan --version</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">使用 Conan 安装 Boost 1.70</span></span><br><span class="line">conan install boost/1.70.0@</span><br></pre></td></tr></table></figure>
+
+<p>安装完成后，只要在<code>CMakeLists.txt</code>中设置<code>Conan</code>的工具链文件路径，并告诉<code>CMake</code>使用<code>Conan</code>管理依赖：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 设置 Conan 的工具链文件：加载由 Conan 生成的 conanbuildinfo.cmake 文件。</span></span><br><span class="line"><span class="keyword">include</span>(<span class="variable">$&#123;CMAKE_BINARY_DIR&#125;</span>/conanbuildinfo.cmake)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 应用加载的 conanbuildinfo.cmake 文件中的配置信息，设置项目的依赖环境。</span></span><br><span class="line">conan_basic_setup()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用 Boost 库</span></span><br><span class="line"><span class="keyword">target_link_libraries</span>(my_target PRIVATE Boost::Boost)</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-5-使用Git-Submodule来管理依赖"><a href="#4-5-使用Git-Submodule来管理依赖" class="headerlink" title="4.5 使用Git Submodule来管理依赖"></a>4.5 使用Git Submodule来管理依赖</h3><p>有时候，你的外部依赖库是通过<code>Git</code>仓库管理的，尤其是一些开源库。<code>CMake</code>能够与<code>Git</code>完美配合，直接把<code>Git</code>仓库作为子模块添加到项目中。比如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">添加 Git 子模块</span></span><br><span class="line">git submodule add https://github.com/boostorg/boost.git thirdParty/boost</span><br><span class="line">git submodule update --init</span><br></pre></td></tr></table></figure>
+<p>然后，在<code>CMake</code>中通过<code>add_subdirectory()</code>引入该子模块，在构建项目时，<code>CMake</code>会自动下载并构建外部依赖库：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 引入 Git 子模块</span></span><br><span class="line"><span class="keyword">add_subdirectory</span>(thirdParty/boost)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用 boost 库</span></span><br><span class="line"><span class="keyword">target_link_libraries</span>(my_target PRIVATE boost)</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-小结"><a href="#5-小结" class="headerlink" title="5. 小结"></a>5. 小结</h2><ul>
+<li>使用条件判断和循环两种流程控制方式，灵活配置<code>CMakeLists.txt</code>；</li>
+<li>使用<code>find_package()</code>、包管理器、<code>Git Submodule</code>解决外部库的集成问题。</li>
+</ul>
+<h2 id="6-下篇预告"><a href="#6-下篇预告" class="headerlink" title="6. 下篇预告"></a>6. 下篇预告</h2><p>构建与调试<br>配置优化</p>
+</div>
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2025-01-24</span>
+            
+                <span>该篇文章被 Zhang Chao</span>
+            
+            
+                <span>打上标签:
+                    
+                    
+                        <a href='/tags/CMake/'>
+                            CMake
+                        </a>
+                    
+                </span>
+             
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/%E5%B7%A5%E5%85%B7/'>
+                            工具
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    <br>
+    
+    
+        
+            
+    
+            <div class="post-footer-pre-next">
+                
+
+                
+                    <span class="post-footer-pre-next-last-span-right">下一篇：<a href="/2025/01/24/CMake-notes-1/">CMake教程（一）：CMake基础用法</a>
+                    </span>
+                
+            </div>
+    
+        
+    
+
+    
+        
+    <div class="comments-container">
+    <div id="comment-anchor"></div>
+    <div class="comment-area-title">
+         
+    </div>
+    
+        
+
+    
+    
+    
+    </div>
+
+
+     
+</div>
+
+
+
+                                      
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2025 Cz 
+
+            
+                
+
+            
+                
+                    / <a href="/contact/"> 联系 </a>
+                
+
+            
+        </span>
+       
+    
+</div>
+
+
+
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>🌊亦余心之所善兮，虽九死其犹未悔🌊</span>
+            
+                <span class="footer-last-span-right"><i>本站由<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/index.html">Hexo</a>驱动｜使用<a target="_blank" rel="noopener" href="https://github.com/HiNinoJay/hexo-theme-A4">Hexo-theme-A4</a>主题</i></span>
+            
+    
+</div>
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+    <!--目录-->
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript" ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" type="text/javascript" ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js" type="text/javascript" ></script>
+        
+<script src="/js/toc.js"></script>
+
+    
+
+    
+<script src="/js/randomHeaderContent.js"></script>
+
+    <!--回到顶部按钮-->
+    
+        
+<script src="/js/returnToTop.js"></script>
+
+    
+
+    
+        
+<script src="/js/returnToLastPage.js"></script>
+
+    
+
+
+
+
+
+<script src="/js/lightgallery/lightgallery.umd.min.js"></script>
+
+
+
+<script src="/js/lightgallery/plugins/lg-thumbnail.umd.min.js"></script>
+
+
+
+<script src="/js/lightgallery/plugins/lg-fullscreen.umd.min.js"></script>
+
+
+<script src="/js/lightgallery/plugins/lg-autoplay.umd.min.js"></script>
+
+
+<script src="/js/lightgallery/plugins/lg-zoom.umd.min.js"></script>
+
+
+<script src="/js/lightgallery/plugins/lg-rotate.umd.min.js"></script>
+
+
+<script src="/js/lightgallery/plugins/lg-paper.umd.min.js"></script>
+
+
+
+
+<script type="text/javascript">
+     
+    if (typeof lightGallery !== "undefined") {
+        var options1 = {
+            selector: '.gallery-item',
+            plugins: [lgThumbnail, lgFullscreen, lgAutoplay, lgZoom, lgRotate, lgPager], // 启用插件
+            thumbnail: true,          // 显示缩略图
+            zoom: true,               // 启用缩放功
+            rotate: true,             // 启用旋转功能能
+            autoplay: true,        // 启用自动播放功能
+            fullScreen: true,      // 启用全屏功能
+            pager: false, //页码,
+            zoomFromOrigin: true,   // 从原始位置缩放
+            actualSize: true,       // 启用查看实际大小的功能
+            enableZoomAfter: 300,    // 延迟缩放，确保图片加载完成后可缩放
+        };
+        lightGallery(document.getElementsByClassName('.article-gallery')[0], options1); // 修复选择器
+    }
+    
+</script>
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script> 
+
+                </div>
+            
+            
+                <!-- 回到顶部的按钮-->  
+                <div class="progress-wrap shadow-drop-2-bottom">
+                    <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+                        <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"/>
+                    </svg>
+                </div>
+            
+            
+                <!-- 返回的按钮-->  
+                <div class="return-to-last-progress-wrap shadow-drop-2-bottom">
+                    <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+                        <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"/>
+                    </svg>
+                </div>
+            
+    </body>
+</html>
