@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="cn">
+    
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport" />
+    <meta name="description" content="CMake教程（四）：CMake生成器表达式与自定义命令" />
+    <meta name="hexo-theme-A4" content="v1.9.6" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.jpg">
+    <title>Cz | A Chinese coder now living in SG</title>
+
+    
+        
+<link rel="stylesheet" href="/css/highlight/style1.css">
+
+        
+<link rel="stylesheet" href="/css/reset.css">
+
+        
+<link rel="stylesheet" href="/css/markdown.css">
+
+        
+<link rel="stylesheet" href="/css/fonts.css">
+ 
+         <!--注意：首页既不是post也不是page-->
+        
+            
+<link rel="stylesheet" href="/css/waline.css">
+
+        
+        
+        
+<link rel="stylesheet" href="/css/ui.css">
+ 
+        
+<link rel="stylesheet" href="/css/style.css">
+
+
+        
+            <!--返回顶部css-->
+            
+<link rel="stylesheet" href="/css/returnToTop.css">
+
+            
+<link rel="stylesheet" href="/css/unicons.css">
+
+        
+        
+            <!--目录-->
+            
+<link rel="stylesheet" href="/css/toc.css">
+
+        
+    
+
+    
+        
+<link rel="stylesheet" href="/css/returnToLastPage.css">
+
+    
+    
+   
+<link rel="stylesheet" href="/css/lightgallery-bundle.min.css">
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+    
+    
+
+    
+    
+
+
+
+    
+
+    
+    
+
+    
+    
+    
+    <body>
+        <script src="/js/darkmode-js.min.js"></script>
+        
+        <script>
+            const options = {
+                bottom: '40px', // default: '32px'
+                right: 'unset', // default: '32px'
+                left: '42px', // default: 'unset'
+                time: '0.3s', // default: '0.3s'
+                mixColor: '#fff', // default: '#fff'
+                backgroundColor: ' #e4e4e4 ',  // default: '#fff'
+                buttonColorDark: '#100f2c',  // default: '#100f2c'
+                buttonColorLight: '#fff', // default: '#fff'
+                saveInCookies: true, // default: true,
+                label: '🌓', // default: ''
+                autoMatchOsTheme: true // default: true
+            }
+            const darkmode = new Darkmode(options);
+            darkmode.showWidget();
+        </script>
+        
+        
+            <div class="left-toc-container">
+                <nav id="toc" class="bs-docs-sidebar"></nav>
+            </div>
+        
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+
+
+<div class="header">
+    <div class="header-container">
+        <style>
+            .header-img {
+                width: 56px;
+                height: auto;
+                object-fit: cover; /* 保持图片比例 */
+                transition: transform 0.3s ease-in-out; 
+                border-radius: 50%; 
+            }
+            
+        </style>
+        <img 
+            alt="^-^" 
+            cache-control="max-age=86400" 
+            class="header-img" 
+            src="/img/favicon.jpg" 
+        />
+        <div class="header-content">
+            <a class="logo" href="/">Cz</a> 
+            <span class="description">#define ME &#34;A coder&#34;</span> 
+        </div>
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">🏃主页</a></li>
+            
+        
+            
+                <li><a href="/list/">🖋️文章</a></li>
+            
+        
+            
+                <li><a href="/tags/">📌标签</a></li>
+            
+        
+            
+                <li><a href="/categories/">🔖分类</a></li>
+            
+        
+            
+                <li><a href="/about/">🙈关于</a></li>
+            
+        
+            
+                <li><a href="/now/">📆碎片</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+    
+
+    
+        
+            
+                <div class="post-main-title" style="text-align: center;">
+                    CMake教程（四）：CMake生成器表达式与自定义命令
+                </div>
+            
+        
+      
+    
+
+    
+
+        
+            <div class="post-head-meta-center">
+        
+                
+                    <span>最近更新：2025-01-26</span> 
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                     <span>字数总计：3.7k</span>
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                    <span>阅读估时：14分钟</span>
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                    <span id="busuanzi_container_page_pv">
+                        阅读量：<span id="busuanzi_value_page_pv"></span>次
+                    </span>
+                
+            </div>
+    
+
+    <div class="post-md">
+        
+            
+        
+        <div class=".article-gallery"><h2 id="1-CMake-自定义模块与函数"><a href="#1-CMake-自定义模块与函数" class="headerlink" title="1. CMake 自定义模块与函数"></a>1. CMake 自定义模块与函数</h2><p>在展开讨论 CMake 生成器表达式和自定义命令之前，我们先来学习两个简单但常用的功能，即如何自定义 CMake 模块和函数。它们负责把重复的构建逻辑封装起来，让构建过程变得更清晰简洁。</p>
+<h3 id="1-1-自定义模块"><a href="#1-1-自定义模块" class="headerlink" title="1.1 自定义模块"></a>1.1 自定义模块</h3><p>一个自定义模块其实就是一个以<code>.cmake</code>结尾的 CMake 文件。C++ 项目根目录下一般都会有一个<code>cmake</code>目录，用来保存这些模块文件，定义一些会复用的构建规则。比如我们在<code>cmake</code>目录下创建一个<code>MyDebugModule.cmake</code>文件来设置常见的编译选项：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># my_project/cmake/MyDebugModule.cmake</span></span><br><span class="line"><span class="keyword">set</span>(CMAKE_CXX_FLAGS <span class="string">&quot;$&#123;CMAKE_CXX_FLAGS&#125; -Wall -Wextra&quot;</span>)</span><br><span class="line"><span class="keyword">set</span>(CMAKE_BUILD_TYPE Debug)</span><br></pre></td></tr></table></figure>
+<p>在根目录的主<code>CMakeLists.txt</code>文件中，通过<code>include()</code>命令引入这个模块：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># my_project/CMakeLists.txt</span></span><br><span class="line"><span class="keyword">include</span>(cmake/MyDebugModule.cmake)</span><br></pre></td></tr></table></figure>
+<p>这样，每次都可以直接用这个模块提供的构建选项，避免每个项目都重复配置。<br>你也可以根据需要创建更多的模块，比如获取版本号、设置库路径、配置编译器、查找依赖等。</p>
+<h3 id="1-2-自定义函数"><a href="#1-2-自定义函数" class="headerlink" title="1.2 自定义函数"></a>1.2 自定义函数</h3><p>除了模块，CMake 还允许我们使用<code>function()</code><strong>自定义函数</strong>，帮助简化重复性的构建任务。例如，当需要为多个源文件设置一些额外的标志，或者将不同的源文件组合成一个库，你可以通过函数来封装这些操作：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># CMakeLists.txt</span></span><br><span class="line"><span class="comment"># 定义一个函数来创建一个可执行文件</span></span><br><span class="line"><span class="keyword">function</span>(create+executable target_name)</span><br><span class="line">    <span class="comment"># $&#123;ARGN&#125; 是 CMake 内置变量，表示传递给函数的其余参数（这里是源文件列表）</span></span><br><span class="line">    <span class="keyword">add_executable</span>(<span class="variable">$&#123;target_name&#125;</span> <span class="variable">$&#123;ARGN&#125;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># -Wall：启用编译器的所有常见警告，有助于捕获潜在问题。</span></span><br><span class="line">    <span class="keyword">target_compile_options</span>(<span class="variable">$&#123;target_name&#125;</span> PRIVATE -Wall) </span><br><span class="line"><span class="keyword">endfunction</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 调用函数来创建项目的可执行文件</span></span><br><span class="line">create_executable(my_app main.cpp foo.cpp bar.cpp)</span><br><span class="line">create_executable(my_app2 main.cpp foo2.cpp bar2.cpp)</span><br></pre></td></tr></table></figure>
+<p>这里我们定义了一个<code>create_executable()</code>函数，它接受一个目标名称和多个源文件作为参数，自动设置编译选项并生成可执行文件。通过这种方式，我们可以避免在每次添加可执行文件时都手动配置编译选项。</p>
+<h2 id="2-CMake-的生成器表达式"><a href="#2-CMake-的生成器表达式" class="headerlink" title="2. CMake 的生成器表达式"></a>2. CMake 的生成器表达式</h2><p>生成器表达式(generator expression)，是一个高级构建技巧，它听起来高大上，但本质是 CMake 提供的一种动态判断工具，用来根据条件自动调整配置，在构建时灵活地选择编译选项、链接库、文件路径等。<br>在上一篇文章里，我们根据通过条件判断来为不同编译器或者不同 build type 设置不同的编译器选项，这往往需要写不少<code>if</code>判断。生成器表达式可以帮我们简化逻辑，不再需要冗长的判断条件。</p>
+<h3 id="2-1-基本格式"><a href="#2-1-基本格式" class="headerlink" title="2.1 基本格式"></a>2.1 基本格式</h3><p>生成器表达式的基本格式是这样的：<code>$&lt;expression&gt;</code>。CMake 会在构建时动态解析它，比如：</p>
+<ul>
+<li><code>$&lt;CONFIG:Debug&gt;</code>：如果当前是 Debug 模式，这个表达式就会被替换成对应的值。</li>
+<li><code>$&lt;TARGET_FILE:my_target&gt;</code>：动态获取目标<code>my_target</code>生成的文件路径。</li>
+</ul>
+<p>我们将通过下面的例子来学习生成器表达式的使用。</p>
+<h3 id="2-2-根据构建类型选择编译选项"><a href="#2-2-根据构建类型选择编译选项" class="headerlink" title="2.2 根据构建类型选择编译选项"></a>2.2 根据构建类型选择编译选项</h3><p>给目标<code>my_target</code>设置编译选项，假如不用生成器表达式，我们可能需要写逻辑分散的冗长的<code>if</code>条件：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 给目标 my_target 设置编译选项</span></span><br><span class="line"><span class="keyword">if</span>(CMAKE_BUILD_TYPE <span class="keyword">STREQUAL</span> <span class="string">&quot;Debug&quot;</span>)</span><br><span class="line">    <span class="keyword">target_compile_options</span>(my_target PRIVATE -g)</span><br><span class="line"><span class="keyword">elseif</span>(CMAKE_BUILD_TYPE <span class="keyword">STREQUAL</span> <span class="string">&quot;Release&quot;</span>)</span><br><span class="line">    <span class="keyword">target_compile_options</span>(my_target PRIVATE -O3)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure>
+<p>用<code>$&lt;CONFIG&gt;</code>表达式，可以很优雅地解决这个问题，而不用手动写一堆<code>if</code>判断：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 给目标 my_target 设置编译选项</span></span><br><span class="line"><span class="keyword">target_compile_options</span>(my_target</span><br><span class="line">  PRIVATE</span><br><span class="line">  $&lt;$&lt;CONFIG:Debug&gt;:-g&gt;       <span class="comment"># 如果是 Debug 模式，启用调试符号</span></span><br><span class="line">  $&lt;$&lt;CONFIG:Release&gt;:-O3&gt;    <span class="comment"># 如果是 Release 模式，启用编译器优化</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>my_target</code>：是构建目标，比如一个可执行文件（<code>add_executable(my_target main.cpp)</code>）或者一个库（<code>add_library(my_target STATIC mylib.cpp)</code>）；</li>
+<li><code>target_compile_options()</code> ：用来给某个目标设置编译选项，比如这里我们根据不同的构建模式，动态添加<code>-g</code>或<code>-O3</code>；</li>
+<li>生成器表达式<code>$&lt;$&lt;CONFIG:Debug&gt;:-g&gt;</code>工作原理：<ul>
+<li><code>$&lt;CONFIG:Debug&gt;</code>：如果当前构建模式是<code>Debug</code>，这个表达式就生效，添加<code>-g</code>选项；</li>
+<li><code>$&lt;CONFIG:Release&gt;</code>：如果当前构建模式是<code>Release</code>，该表达式就生效，添加<code>-O3</code>选项。</li>
+</ul>
+</li>
+</ul>
+<p>再比如有些项目在 Debug 和 Release 模式下需要使用不同的运行时库，比如在 Debug 模式用带调试符号的库，而在 Release 模式用优化过的库。这种需求也可以用<code>$&lt;CONFIG&gt;</code>表达式搞定：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">target_link_libraries</span>(my_target</span><br><span class="line">    PRIVATE</span><br><span class="line">    $&lt;$&lt;CONFIG:Debug&gt;:debug_runtime&gt;</span><br><span class="line">    $&lt;$&lt;CONFIG:Release&gt;:release_runtime&gt;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>$&lt;$&lt;CONFIG:Debug&gt;:debug_runtime&gt;</code>：如果当前构建模式是 Debug，CMake 会自动链接<code>debug_runtime</code>库；</li>
+<li><code>$&lt;$&lt;CONFIG:Release&gt;:release_runtime&gt;</code>：如果当前构建模式是 Release，CMake 会链接<code>release_runtime</code>库。</li>
+</ul>
+<h3 id="2-3-在不同平台使用不同的库"><a href="#2-3-在不同平台使用不同的库" class="headerlink" title="2.3 在不同平台使用不同的库"></a>2.3 在不同平台使用不同的库</h3><p>假设你在 Windows 上要链接<code>ws2_32</code>库，而在 Linux 上要链接<code>pthread</code>库。你可以使用<code>$&lt;TARGET_OS&gt;</code>表达式来做平台判断：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">target_link_libraries</span>(my_target</span><br><span class="line">    PRIVATE</span><br><span class="line">    $&lt;$&lt;TARGET_OS:Windows&gt;:ws2_32&gt;</span><br><span class="line">    $&lt;$&lt;TARGET_OS:Linux&gt;:pthread&gt;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>$&lt;$&lt;TARGET_OS:Windows&gt;:ws2_32&gt;</code>：当目标平台是 Windows 时链接<code>ws2_32</code>库；</li>
+<li><code>$&lt;$&lt;TARGET_OS:Linux&gt;:pthread&gt;</code>：当目标平台是 Linux 时链接<code>pthread</code>库。</li>
+</ul>
+<h3 id="2-4-根据目标类型动态设置链接库"><a href="#2-4-根据目标类型动态设置链接库" class="headerlink" title="2.4 根据目标类型动态设置链接库"></a>2.4 根据目标类型动态设置链接库</h3><p>如果你的目标需要链接不同的库（比如静态库和动态库）。你可以使用<code>$&lt;TARGET_TYPE&gt;</code>表达式来根据目标的类型选择正确的库：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">target_link_libraries</span>(my_target</span><br><span class="line">    PRIVATE</span><br><span class="line">    $&lt;$&lt;TARGET_TYPE:STATIC_LIBRARY&gt;:libstatic.a&gt;</span><br><span class="line">    $&lt;$&lt;TARGET_TYPE:SHARED_LIBRARY&gt;:libshared.so&gt;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>$&lt;$&lt;TARGET_TYPE:STATIC_LIBRARY&gt;:libstatic.a&gt;</code>：如果<code>my_target</code>是静态库，就链接<code>libstatic.a</code>；</li>
+<li><code>$&lt;$&lt;TARGET_TYPE:SHARED_LIBRARY&gt;:libshared.so&gt;</code>：如果<code>my_target</code>是动态库，就链接<code>libshared.so</code>。</li>
+</ul>
+<h3 id="2-5-获取目标文件的路径"><a href="#2-5-获取目标文件的路径" class="headerlink" title="2.5 获取目标文件的路径"></a>2.5 获取目标文件的路径</h3><p>假设你需要在构建后复制一个目标的可执行文件或者库文件到某个目录，这时候你可以用<code>$&lt;TARGET_FILE&gt;</code>表达式来获取目标的文件路径：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_executable</span>(my_app main.cpp)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在构建完成后复制可执行文件到 /path/to/output</span></span><br><span class="line"><span class="keyword">add_custom_command</span>(<span class="keyword">TARGET</span> my_app POST_BUILD</span><br><span class="line">    <span class="keyword">COMMAND</span> <span class="variable">$&#123;CMAKE_COMMAND&#125;</span> -E copy $&lt;TARGET_FILE:my_app&gt; /path/to/output/</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>$&lt;TARGET_FILE:my_app&gt;</code>：动态获取目标<code>my_app</code>的输出文件路径；</li>
+<li><code>add_custom_command()</code>：定义了一个构建后（<code>POST_BUILD</code>）的操作：复制（<code>copy</code>）文件到目标目录（<code>/path/to/output/</code>）。<br>这个用法非常适合需要在构建后对文件进行处理的场景，比如将二进制文件复制到指定目录，或者作为输入给后续的工具使用。</li>
+</ul>
+<h3 id="2-6-根据编译器设置选项："><a href="#2-6-根据编译器设置选项：" class="headerlink" title="2.6 根据编译器设置选项："></a>2.6 根据编译器设置选项：</h3><p>跨平台项目往往需要支持多种编译器，比如 GCC 和 Clang。不同的编译器可能有自己独特的选项，并不完全兼容，比如 Clang 支持<code>-Weverything</code>，但 GCC 不支持。因此我们需要根据使用的编译器，动态设置合适的编译选项，避免构建失败。这时候可以选择<code>$&lt;CXX_COMPILER_ID&gt;</code>生成器表达式：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 编译器编译过程中开启所有警告</span></span><br><span class="line"><span class="keyword">target_compile_options</span>(my_target</span><br><span class="line">    PRIVATE</span><br><span class="line">    $&lt;$&lt;CXX_COMPILER_ID:GNU&gt;:-Wall -Wextra&gt;</span><br><span class="line">    $&lt;$&lt;CXX_COMPILER_ID:Clang&gt;:-Weverything&gt;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>my_target</code>：目标文件，比如通过<code>add_executable(my_target main.cpp)</code>创建的目标可执行文件；</li>
+<li><code>$&lt;$&lt;CXX_COMPILER_ID:GNU&gt;:-Wall -Wextra&gt;</code>：如果你用的是 GNU 编译器（比如 GCC），这段表达式就会添加<code>-Wall</code>和<code>-Wextra</code>选项，用来启用常见的警告；</li>
+<li><code>$&lt;$&lt;CXX_COMPILER_ID:Clang&gt;:-Weverything&gt;</code>：如果你用的是 Clang 编译器，这段表达式就会添加<code>-Weverything</code>，它会启用 Clang 的所有警告。</li>
+</ul>
+<h3 id="2-7-根据操作系统设置路径"><a href="#2-7-根据操作系统设置路径" class="headerlink" title="2.7 根据操作系统设置路径"></a>2.7 根据操作系统设置路径</h3><p>如果你的项目需要在不同的操作系统（比如 Windows 和 Linux）上运行，可能会用到不同的路径来查找库或头文件。这时候，你可以用<code>$&lt;PLATFORM_ID&gt;</code>表达式来自动判断当前的操作系统，并设置对应的路径：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">target_include_directories</span>(my_target</span><br><span class="line">    PRIVATE</span><br><span class="line">    $&lt;$&lt;PLATFORM_ID:Windows&gt;:C:/libs/<span class="keyword">include</span>&gt;</span><br><span class="line">    $&lt;$&lt;PLATFORM_ID:Linux&gt;:/usr/local/<span class="keyword">include</span>&gt;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>$&lt;$&lt;PLATFORM_ID:Windows&gt;:C:/libs/include&gt;</code>：如果当前的平台是 Windows，就添加<code>C:/libs/include</code>作为头文件路径；</li>
+<li><code>$&lt;$&lt;PLATFORM_ID:Linux&gt;:/usr/local/include&gt;</code>：如果当前的平台是 Linux，就添加<code>/usr/local/include</code>作为头文件路径。</li>
+</ul>
+<h3 id="2-8-添加条件性的编译定义"><a href="#2-8-添加条件性的编译定义" class="headerlink" title="2.8 添加条件性的编译定义"></a>2.8 添加条件性的编译定义</h3><p>有时候，我们的项目需要根据配置来启用或禁用某些功能。比如：</p>
+<ul>
+<li>开启一个实验性功能</li>
+<li>启用调试日志</li>
+<li>控制某些代码片段是否参与编译</li>
+<li>…</li>
+</ul>
+<p>这类需求可以通过生成器表达式<code>$&lt;BOOL&gt;</code>来实现：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">target_compile_definitions</span>(my_target</span><br><span class="line">    PRIVATE</span><br><span class="line">    $&lt;$&lt;BOOL&gt;:<span class="variable">$&#123;MY_FEATURE_ENABLED&#125;</span>:FEATURE_ENABLED&gt;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>my_target</code>：目标文件，比如通过<code>add_executable(my_target main.cpp)</code>创建的目标可执行文件或者是一个库；</li>
+<li><code>$&#123;MY_FEATURE_ENABLED&#125;</code>：是一个变量，用来决定某个功能是否启用，你可以在<code>CMakeLists.txt</code>中设置它：<code>set(MY_FEATURE_ENABLED ON)</code></li>
+<li><code>$&lt;$&lt;BOOL&gt;:$&#123;MY_FEATURE_ENABLED&#125;:FEATURE_ENABLED&gt;</code>：如果<code>MY_FEATURE_ENABLED</code>为<code>True</code>，那么 CMake 将添加宏<code>FEATURE_ENABLED</code>到编译器中，否则不添加。 C++ 代码可能是这样的：</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifdef</span> FEATURE_ENABLED</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">useFeature</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// feature implementation</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> FEATURE_ENABLED</span></span><br><span class="line">    <span class="built_in">useFeature</span>();</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-CMake-代码生成与自定义命令"><a href="#3-CMake-代码生成与自定义命令" class="headerlink" title="3. CMake 代码生成与自定义命令"></a>3. CMake 代码生成与自定义命令</h2><p>除了生成器表达式外，CMake 还提供了一个非常强大的功能：<u>代码生成与自定义命令</u>。它允许你在构建过程中添加一些自定义操作，如自动生成代码、运行脚本，或编译之后执行某些操作。在<a href="#25-%E8%8E%B7%E5%8F%96%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E7%9A%84%E8%B7%AF%E5%BE%84">第2.5节</a>我们使用过<code>add_custom_command()</code>，除此之外还有一个命令<code>add_custom_target()</code>，下面我们对两个命令进行区分和讲解：</p>
+<h3 id="3-1-add-custom-command：自定义构建指令"><a href="#3-1-add-custom-command：自定义构建指令" class="headerlink" title="3.1 add_custom_command：自定义构建指令"></a>3.1 add_custom_command：自定义构建指令</h3><p><code>add_custom_command</code>主要是用来在构建过程中执行某些指令的，通常是生成一些文件或者运行外部程序。比如，你可能需要在编译之前生成一些源代码文件，或者调用外部工具来做点事情：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_custom_command</span>(</span><br><span class="line">    OUTPUT output_file         <span class="comment"># 生成的文件</span></span><br><span class="line">    <span class="keyword">COMMAND</span> some_command       <span class="comment"># 执行的命令</span></span><br><span class="line">    DEPENDS input_file         <span class="comment"># 依赖的文件，只有这些文件有改动才会重新执行命令</span></span><br><span class="line">    COMMENT <span class="string">&quot;I&#x27;m comment text&quot;</span> <span class="comment"># 运行时会显示的提示信息</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>OUTPUT</code>：你最终要生成的文件</li>
+<li><code>COMMAND</code>：你要运行的命令，比如执行脚本、调用程序等</li>
+<li><code>DEPENDS</code>：这个命令依赖的文件，只有这些文件变化了，命令才会被执行</li>
+<li><code>COMMENT</code>：执行命令时显示的提示，类似日志信息，帮助你知道命令在做什么</li>
+</ul>
+<h4 id="示例（1）"><a href="#示例（1）" class="headerlink" title="示例（1）"></a>示例（1）</h4><p>假设你有一个 Python 脚本<code>generate_code.py</code>，它会根据一些配置文件（比如一个 JSON 文件<code>config.json</code>）生成<code>.cpp</code>文件。那么你可以用<code>add_custom_command</code>来运行这个 Python 脚本：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_custom_command</span>(</span><br><span class="line">    OUTPUT generated_code.cpp</span><br><span class="line">    <span class="keyword">COMMAND</span> python3 generate_code.py config.json generated_code.cpp</span><br><span class="line">    DEPENDS generate_code.py config.json</span><br><span class="line">    COMMENT <span class="string">&quot;Generating C++ code from JSON configuration&quot;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>每次<code>generate_code.py</code>或<code>config.json</code>改动时，CMake 就会重新运行这个命令，生成<code>generated_code.cpp</code>文件。而这个<code>.cpp</code>文件在编译时会作为源代码编译进你的项目。</p>
+<h4 id="示例（2）"><a href="#示例（2）" class="headerlink" title="示例（2）"></a>示例（2）</h4><p>你可能会遇到需要在构建完成后做一些额外工作的情况，比如复制某些生成的文件到某个目录。这时候就可以用到<code>add_custom_command</code>的<code>POST_BUILD</code>选项：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_executable</span>(my_app main.cpp)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在构建完成后，复制生成的可执行文件</span></span><br><span class="line"><span class="keyword">add_custom_command</span>(<span class="keyword">TARGET</span> my_app POST_BUILD</span><br><span class="line">    <span class="keyword">COMMAND</span> <span class="variable">$&#123;CMAKE_COMMAND&#125;</span> -E copy $&lt;TARGET_FILE:my_app&gt; /path/to/output/</span><br><span class="line">    COMMENT <span class="string">&quot;Copying executable to output directory&quot;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>通过<code>add_custom_command</code>指定了一个后置构建命令（<code>POST_BUILD</code>）；</li>
+<li>在<code>my_app</code>构建完成后，自动将生成的可执行文件复制到<code>/path/to/output/</code></li>
+<li><code>$&lt;TARGET_FILE:my_app&gt;</code>：会自动获取<code>my_app</code>目标生成的文件路径。</li>
+</ul>
+<h3 id="3-2-add-custom-target：自定义构建目标"><a href="#3-2-add-custom-target：自定义构建目标" class="headerlink" title="3.2 add_custom_target：自定义构建目标"></a>3.2 add_custom_target：自定义构建目标</h3><p>有时，你可能需要在构建过程中做一些额外的工作，比如生成一个文档、清理临时文件、或者执行一些特殊的操作。但是，这些工作并不是用来生成最终的可执行文件或库的。这个时候，你可以使用<code>add_custom_target</code>。<br><code>add_custom_target</code>是用来创建一个“自定义任务”的。它和<code>add_executable</code>或<code>add_library</code>类似，但不是用来生成可执行文件或库，而是执行一些你需要的额外命令：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_custom_target</span>(</span><br><span class="line">    target_name               <span class="comment"># 自定义目标的名字</span></span><br><span class="line">    <span class="keyword">COMMAND</span> <span class="keyword">command</span> [args...] <span class="comment"># 要执行的命令</span></span><br><span class="line">    DEPENDS dependency_files  <span class="comment"># 依赖的文件，确保这些文件变动时目标会执行</span></span><br><span class="line">    COMMENT <span class="string">&quot;Custom target&quot;</span>   <span class="comment"># 显示提示信息</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>target_name</code>：定义的目标名字，类似<code>my_app</code>或<code>my_lib</code>，但是这个目标不一定会生成实际文件；</li>
+<li><code>COMMAND</code>：要执行的命令或脚本；</li>
+<li><code>DEPENDS</code>：目标的依赖文件，文件有变化时，CMake 会重新执行目标；</li>
+<li><code>COMMENT</code>：显示的提示信息。</li>
+</ul>
+<h4 id="示例（1）-1"><a href="#示例（1）-1" class="headerlink" title="示例（1）"></a>示例（1）</h4><p>假设你要生成文档、打包文件等任务，可以通过<code>add_custom_target</code>，创建一个“生成文档”的目标：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_custom_target</span>(</span><br><span class="line">    generate_docs</span><br><span class="line">    <span class="keyword">COMMAND</span> doxygen Doxyfile</span><br><span class="line">    COMMENT <span class="string">&quot;Generating project documentation&quot;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>然后，你可以设置让文档生成与其他构建任务关联，比如在编译时自动生成文档：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_dependencies</span>(my_project generate_docs)</span><br></pre></td></tr></table></figure>
+<p>这样每次构建<code>my_project</code>时，CMake 就会先生成文档，确保文档是最新的。</p>
+<h4 id="示例（2）-1"><a href="#示例（2）-1" class="headerlink" title="示例（2）"></a>示例（2）</h4><p>假如你想在每次构建时清理掉一些临时文件，但这些文件并不是你的项目的主要输出，这时候你可以用<code>add_custom_target</code>来做一个清理任务：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建一个名为 clean_temp 的自定义目标</span></span><br><span class="line"><span class="keyword">add_custom_target</span>(clean_temp</span><br><span class="line">    <span class="keyword">COMMAND</span> <span class="variable">$&#123;CMAKE_COMMAND&#125;</span> -E remove_directory <span class="variable">$&#123;CMAKE_BINARY_DIR&#125;</span>/temp_folder</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>这里，<code>clean_temp</code>这个目标并不会生成什么文件，而是执行一个清理文件夹的任务。你可以在构建项目时或者其他需要的时候调用这个任务。</p>
+<p>那么，<code>add_custom_command</code>和<code>add_custom_target</code>到底有什么不同呢？</p>
+<ul>
+<li><code>add_custom_command</code>主要是用来定义<strong>某个具体的构建步骤</strong>，比如执行一个命令生成文件。它可以跟具体的文件生成和依赖有关，是和生成的文件绑定的。一般来说，你不会直接调用它，而是通过它生成的文件来触发其他操作；</li>
+<li><code>add_custom_target</code>更像是定义了一个<strong>独立的任务</strong>，它是一个目标，可以把多个命令绑定在一起，成为一个执行步骤。你可以把它当作一个特殊的构建目标来执行，像生成文档、清理文件等任务都可以使用它。</li>
+</ul>
+<h2 id="4-小结"><a href="#4-小结" class="headerlink" title="4. 小结"></a>4. 小结</h2><ul>
+<li>通过单独的<code>.cmake</code>文件生成自定义模块；</li>
+<li>通过<code>function</code>定义函数，将重复的构建逻辑封装起来；</li>
+<li>通过 CMake 的生成器表达式更高效地构建项目；</li>
+<li>通过<code>add_custom_command</code>和<code>add_custom_target</code>，让项目的构建更加智能和高效。</li>
+</ul>
+<h2 id="5-下篇预告"><a href="#5-下篇预告" class="headerlink" title="5. 下篇预告"></a>5. 下篇预告</h2><ul>
+<li>包管理与安装配置</li>
+<li>CMake 最佳实践与常见问题</li>
+</ul>
+</div>
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2025-01-25</span>
+            
+                <span>该篇文章被 Zhang Chao</span>
+            
+            
+                <span>打上标签:
+                    
+                    
+                        <a href='/tags/CMake/'>
+                            CMake
+                        </a>
+                    
+                </span>
+             
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/%E5%B7%A5%E5%85%B7/'>
+                            工具
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    <br>
+    
+    
+        
+            
+    
+            <div class="post-footer-pre-next">
+                
+
+                
+                    <span class="post-footer-pre-next-last-span-right">下一篇：<a href="/2025/01/25/CMake-notes-3/">CMake教程（三）：CMake项目构建、调试与性能优化</a>
+                    </span>
+                
+            </div>
+    
+        
+    
+
+    
+        
+    <div class="comments-container">
+    <div id="comment-anchor"></div>
+    <div class="comment-area-title">
+         
+    </div>
+    
+        
+
+    
+    
+    
+    </div>
+
+
+     
+</div>
+
+
+
+                                      
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2025 Cz 
+
+            
+                
+
+            
+                
+                    / <a href="/contact/"> 联系 </a>
+                
+
+            
+        </span>
+       
+    
+</div>
+
+
+
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>🌊亦余心之所善兮，虽九死其犹未悔🌊</span>
+            
+                <span class="footer-last-span-right"><i>本站由<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/index.html">Hexo</a>驱动｜使用<a target="_blank" rel="noopener" href="https://github.com/HiNinoJay/hexo-theme-A4">Hexo-theme-A4</a>主题</i></span>
+            
+    
+</div>
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+    <!--目录-->
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript" ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" type="text/javascript" ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js" type="text/javascript" ></script>
+        
+<script src="/js/toc.js"></script>
+
+    
+
+    
+<script src="/js/randomHeaderContent.js"></script>
+
+    <!--回到顶部按钮-->
+    
+        
+<script src="/js/returnToTop.js"></script>
+
+    
+
+    
+        
+<script src="/js/returnToLastPage.js"></script>
+
+    
+
+
+
+
+
+<script src="/js/lightgallery/lightgallery.umd.min.js"></script>
+
+
+
+<script src="/js/lightgallery/plugins/lg-thumbnail.umd.min.js"></script>
+
+
+
+<script src="/js/lightgallery/plugins/lg-fullscreen.umd.min.js"></script>
+
+
+<script src="/js/lightgallery/plugins/lg-autoplay.umd.min.js"></script>
+
+
+<script src="/js/lightgallery/plugins/lg-zoom.umd.min.js"></script>
+
+
+<script src="/js/lightgallery/plugins/lg-rotate.umd.min.js"></script>
+
+
+<script src="/js/lightgallery/plugins/lg-paper.umd.min.js"></script>
+
+
+
+
+<script type="text/javascript">
+     
+    if (typeof lightGallery !== "undefined") {
+        var options1 = {
+            selector: '.gallery-item',
+            plugins: [lgThumbnail, lgFullscreen, lgAutoplay, lgZoom, lgRotate, lgPager], // 启用插件
+            thumbnail: true,          // 显示缩略图
+            zoom: true,               // 启用缩放功
+            rotate: true,             // 启用旋转功能能
+            autoplay: true,        // 启用自动播放功能
+            fullScreen: true,      // 启用全屏功能
+            pager: false, //页码,
+            zoomFromOrigin: true,   // 从原始位置缩放
+            actualSize: true,       // 启用查看实际大小的功能
+            enableZoomAfter: 300,    // 延迟缩放，确保图片加载完成后可缩放
+        };
+        lightGallery(document.getElementsByClassName('.article-gallery')[0], options1); // 修复选择器
+    }
+    
+</script>
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script> 
+
+                </div>
+            
+            
+                <!-- 回到顶部的按钮-->  
+                <div class="progress-wrap shadow-drop-2-bottom">
+                    <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+                        <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"/>
+                    </svg>
+                </div>
+            
+            
+                <!-- 返回的按钮-->  
+                <div class="return-to-last-progress-wrap shadow-drop-2-bottom">
+                    <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+                        <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"/>
+                    </svg>
+                </div>
+            
+    </body>
+</html>
