@@ -197,7 +197,7 @@
             <div class="post-head-meta-center">
         
                 
-                    <span>最近更新：2025-01-24</span> 
+                    <span>最近更新：2025-01-25</span> 
                 
                 
                     
@@ -316,7 +316,7 @@
 <li>使用<code>target_include_directories()</code>设置库的头文件路径，指向根目录下的<code>include/</code>目录，通过<code>PUBLIC</code>关键字，确保其他需要引用<code>mylib</code>的目标能够找到头文件。</li>
 </ul>
 <h4 id="2-3-5-项目根目录的头文件（include-）"><a href="#2-3-5-项目根目录的头文件（include-）" class="headerlink" title="2.3.5 项目根目录的头文件（include&#x2F;）"></a>2.3.5 项目根目录的头文件（include&#x2F;）</h4><p>在<code>include/</code>目录下存放了项目的头文件。需要注意的是，我们不需要在<code>src/</code>和<code>libs/</code>的<code>CMakeLists.txt</code>文件中列出这些头文件。<br><code>CMake</code>会自动知道你从<code>include/</code>目录中包含头文件，只要你确保<code>src/</code>和<code>libs/</code>目录下的<code>CMakeLists.txt</code>文件中正确配置了<code>target_include_directories()</code>。</p>
-<h4 id="2-3-6-构建项目"><a href="#2-3-6-构建项目" class="headerlink" title="2.3.6 构建项目"></a>2.3.6 构建项目</h4><p>一切准备就绪后，开始构建项目，进入到根节点目录的<code>build</code>目录中，按照<a href="#1.4%E7%BC%96%E8%AF%91%E8%BF%90%E8%A1%8C">1.4</a>示例中的指令进行构建和编译即可。编译完成后，所有生成的文件（包括目标文件、可执行文件等）都会被放到<code>build/</code>目录中。<br>这种多目录的管理方式，会让你的项目变得更加模块化、易于扩展，同时也方便多人协作开发。如果以后需要添加新的库或源文件，只需在对应子目录的<code>CMakeLists.txt</code>中做调整，而根目录只需要引入子目录即可。</p>
+<h4 id="2-3-6-构建项目"><a href="#2-3-6-构建项目" class="headerlink" title="2.3.6 构建项目"></a>2.3.6 构建项目</h4><p>一切准备就绪后，开始构建项目，进入到根节点目录的<code>build</code>目录中，按照<a href="#14-%E7%BC%96%E8%AF%91%E8%BF%90%E8%A1%8C">1.4节</a>示例中的指令进行构建和编译即可。编译完成后，所有生成的文件（包括目标文件、可执行文件等）都会被放到<code>build/</code>目录中。<br>这种多目录的管理方式，会让你的项目变得更加模块化、易于扩展，同时也方便多人协作开发。如果以后需要添加新的库或源文件，只需在对应子目录的<code>CMakeLists.txt</code>中做调整，而根目录只需要引入子目录即可。</p>
 <h2 id="3-小结："><a href="#3-小结：" class="headerlink" title="3. 小结："></a>3. 小结：</h2><p><code>CMake</code>可以非常有效地管理多个目录下的源代码和库，简化编译构建过程和编译过程：</p>
 <ul>
 <li>使用<code>cmake_minimum_required()</code>指定最低版本；</li>

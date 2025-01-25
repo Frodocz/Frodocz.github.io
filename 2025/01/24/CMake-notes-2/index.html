@@ -239,7 +239,7 @@
 <p>在<code>CMake</code>中，使用<code>set</code>命令可以创建一个<code>list</code>。一个在<code>list</code>内部是一个由分号<code>;</code>分割的一组字符串。例如，<code>set(var a b c d e)</code>命令将会创建一个<code>list:a;b;c;d;e</code>，但是最终打印变量值的时候得到的是<code>abcde</code>。</p>
 <h3 id="1-2-字符串移除"><a href="#1-2-字符串移除" class="headerlink" title="1.2 字符串移除"></a>1.2 字符串移除</h3><p>在上面的例子中，我们通过<code>file</code>搜索某个目录就得到了该目录下所有的源文件，但是其中有些源文件并不是我们所需要的，比如：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">project/</span><br><span class="line">├── main.cpp</span><br><span class="line">├── helper1.cpp</span><br><span class="line">├── helper2.cpp</span><br><span class="line">└── CMakeLists.txt</span><br></pre></td></tr></table></figure>
-<p>在当前目录有三个源文件，其中main.cpp是一个测试文件。如果我们想要把相关的源文件生成一个动态库给别人使用，那么只需要helper1.cpp、helper2.cpp这两个源文件就可以了。此时，就需要将main.cpp从搜索到的数据中剔除出去。想要实现这个功能，也可以使用<code>list</code>：</p>
+<p>在当前目录有三个源文件，其中<code>main.cpp</code>是一个测试文件。如果我们想要把相关的源文件生成一个动态库给别人使用，那么只需要<code>helper1.cpp</code>、<code>helper2.cpp</code>这两个源文件就可以了。此时，就需要将<code>main.cpp</code>从搜索到的数据中剔除出去。想要实现这个功能，也可以使用<code>list</code>：</p>
 <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">list</span>(REMOVE_ITEM &lt;<span class="keyword">list</span>&gt; &lt;value&gt; [&lt;value&gt; ...])</span><br></pre></td></tr></table></figure>
 <p>通过上面的命令原型可以看到删除和追加数据类似，只不过是第一个参数变成了<code>REMOVE_ITEM</code>。</p>
 <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.0</span>)</span><br><span class="line"><span class="keyword">project</span>(<span class="keyword">TEST</span>)</span><br><span class="line"><span class="keyword">set</span>(TEMP <span class="string">&quot;hello,world&quot;</span>)</span><br><span class="line"><span class="keyword">file</span>(GLOB SRC_1 <span class="variable">$&#123;PROJECT_SOURCE_DIR&#125;</span>/*.cpp)</span><br><span class="line"><span class="comment"># 移除前日志</span></span><br><span class="line"><span class="keyword">message</span>(STATUS <span class="string">&quot;message: $&#123;SRC_1&#125;&quot;</span>)</span><br><span class="line"><span class="comment"># 移除 main.cpp</span></span><br><span class="line"><span class="keyword">list</span>(REMOVE_ITEM SRC_1 <span class="variable">$&#123;PROJECT_SOURCE_DIR&#125;</span>/main.cpp)</span><br><span class="line"><span class="comment"># 移除后日志</span></span><br><span class="line"><span class="keyword">message</span>(STATUS <span class="string">&quot;message: $&#123;SRC_1&#125;&quot;</span>)</span><br></pre></td></tr></table></figure>
@@ -368,7 +368,7 @@
 <ul>
 <li><code>loop_var</code>：存储每次循环取出的值，可以根据要遍历的列表的数量指定多个变量，用于存储对应的列表当前取出的那个值<ul>
 <li>如果指定了<u>多个变量名，它们的数量应等于要遍历的列表数量</u></li>
-<li>如果只给出了一个<code>loop_var</code>，那么它将一系列的<code>loop_var_N</code>变量来存储对应列表中的当前项，也就是说**<code>loop_var_0</code>对应第一个列表**，<code>loop_var_1</code>对应第二个列表，以此类推…</li>
+<li>如果只给出了一个<code>loop_var</code>，那么它将一系列的<code>loop_var_N</code>变量来存储对应列表中的当前项，也就是说<strong><code>loop_var_0</code>对应第一个列表</strong>，<code>loop_var_1</code>对应第二个列表，以此类推…</li>
 <li>如果遍历的多个列表中一个列表较短，当它遍历完成之后将不会再参与后续的遍历（因为其它列表还没有遍历完）</li>
 </ul>
 </li>
@@ -489,7 +489,10 @@
 <li>使用条件判断和循环两种流程控制方式，灵活配置<code>CMakeLists.txt</code>；</li>
 <li>使用<code>find_package()</code>、包管理器、<code>Git Submodule</code>解决外部库的集成问题。</li>
 </ul>
-<h2 id="6-下篇预告"><a href="#6-下篇预告" class="headerlink" title="6. 下篇预告"></a>6. 下篇预告</h2><p>构建与调试<br>配置优化</p>
+<h2 id="6-下篇预告"><a href="#6-下篇预告" class="headerlink" title="6. 下篇预告"></a>6. 下篇预告</h2><ul>
+<li>CMake 项目构建与调试</li>
+<li>CMake 性能优化</li>
+</ul>
 </div>
     </div>
 
@@ -530,6 +533,8 @@
             
     
             <div class="post-footer-pre-next">
+                
+                    <span>上一篇：<a href='/2025/01/25/CMake-notes-3/'>CMake教程（三）：CMake项目构建、调试与性能优化</a></span>
                 
 
                 
