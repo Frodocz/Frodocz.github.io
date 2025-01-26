@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="cn">
+    
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport" />
+    <meta name="description" content="CMake教程（五）：CMake安装配置与最佳实践" />
+    <meta name="hexo-theme-A4" content="v1.9.6" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.jpg">
+    <title>Cz | A Chinese coder now living in SG</title>
+
+    
+        
+<link rel="stylesheet" href="/css/highlight/style1.css">
+
+        
+<link rel="stylesheet" href="/css/reset.css">
+
+        
+<link rel="stylesheet" href="/css/markdown.css">
+
+        
+<link rel="stylesheet" href="/css/fonts.css">
+ 
+         <!--注意：首页既不是post也不是page-->
+        
+            
+<link rel="stylesheet" href="/css/waline.css">
+
+        
+        
+        
+<link rel="stylesheet" href="/css/ui.css">
+ 
+        
+<link rel="stylesheet" href="/css/style.css">
+
+
+        
+            <!--返回顶部css-->
+            
+<link rel="stylesheet" href="/css/returnToTop.css">
+
+            
+<link rel="stylesheet" href="/css/unicons.css">
+
+        
+        
+            <!--目录-->
+            
+<link rel="stylesheet" href="/css/toc.css">
+
+        
+    
+
+    
+        
+<link rel="stylesheet" href="/css/returnToLastPage.css">
+
+    
+    
+   
+<link rel="stylesheet" href="/css/lightgallery-bundle.min.css">
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+    
+    
+
+    
+    
+
+
+
+    
+
+    
+    
+
+    
+    
+    
+    <body>
+        <script src="/js/darkmode-js.min.js"></script>
+        
+        <script>
+            const options = {
+                bottom: '40px', // default: '32px'
+                right: 'unset', // default: '32px'
+                left: '42px', // default: 'unset'
+                time: '0.3s', // default: '0.3s'
+                mixColor: '#fff', // default: '#fff'
+                backgroundColor: ' #e4e4e4 ',  // default: '#fff'
+                buttonColorDark: '#100f2c',  // default: '#100f2c'
+                buttonColorLight: '#fff', // default: '#fff'
+                saveInCookies: true, // default: true,
+                label: '🌓', // default: ''
+                autoMatchOsTheme: true // default: true
+            }
+            const darkmode = new Darkmode(options);
+            darkmode.showWidget();
+        </script>
+        
+        
+            <div class="left-toc-container">
+                <nav id="toc" class="bs-docs-sidebar"></nav>
+            </div>
+        
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+
+
+<div class="header">
+    <div class="header-container">
+        <style>
+            .header-img {
+                width: 56px;
+                height: auto;
+                object-fit: cover; /* 保持图片比例 */
+                transition: transform 0.3s ease-in-out; 
+                border-radius: 50%; 
+            }
+            
+        </style>
+        <img 
+            alt="^-^" 
+            cache-control="max-age=86400" 
+            class="header-img" 
+            src="/img/favicon.jpg" 
+        />
+        <div class="header-content">
+            <a class="logo" href="/">Cz</a> 
+            <span class="description">#define ME &#34;A coder&#34;</span> 
+        </div>
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">🏃主页</a></li>
+            
+        
+            
+                <li><a href="/list/">🖋️文章</a></li>
+            
+        
+            
+                <li><a href="/tags/">📌标签</a></li>
+            
+        
+            
+                <li><a href="/categories/">🔖分类</a></li>
+            
+        
+            
+                <li><a href="/about/">🙈关于</a></li>
+            
+        
+            
+                <li><a href="/now/">📆碎片</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+    
+
+    
+        
+            
+                <div class="post-main-title" style="text-align: center;">
+                    CMake教程（五）：CMake安装配置与最佳实践
+                </div>
+            
+        
+      
+    
+
+    
+
+        
+            <div class="post-head-meta-center">
+        
+                
+                    <span>最近更新：2025-01-26</span> 
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                     <span>字数总计：3.2k</span>
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                    <span>阅读估时：12分钟</span>
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                    <span id="busuanzi_container_page_pv">
+                        阅读量：<span id="busuanzi_value_page_pv"></span>次
+                    </span>
+                
+            </div>
+    
+
+    <div class="post-md">
+        
+            
+        
+        <div class=".article-gallery"><p>本篇文章作为系列的最后一篇，首先通过一个例子来讲解如何完成一个完整的安装配置，并介绍笔者认为的 CMake 最佳实践。</p>
+<h2 id="1-CMake-包管理与安装配置"><a href="#1-CMake-包管理与安装配置" class="headerlink" title="1. CMake 包管理与安装配置"></a>1. CMake 包管理与安装配置</h2><p>当我们完成一个很棒的库，希望能优雅地分发给别人使用时，我们可以使用 CMake 强大的包管理和安装配置功能。<br>假设我们写了一个简单的数学库<code>MathLib</code>，代码结构如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">makefile</span><br><span class="line">MathLib/</span><br><span class="line">├── CMakeLists.txt         <span class="comment"># 顶层 CMake 配置文件</span></span><br><span class="line">├── include/</span><br><span class="line">│   └── MathLib.h          <span class="comment"># 头文件</span></span><br><span class="line">├── src/</span><br><span class="line">│   └── MathLib.cpp        <span class="comment"># 源文件</span></span><br><span class="line">└── main.cpp               <span class="comment"># 示例程序（供测试）</span></span><br></pre></td></tr></table></figure>
+<p>我们的目标很简单：</p>
+<ol>
+<li>把库文件和头文件“打包”到一个地方；</li>
+<li>使用者可以通过<code>find_package(MathLib)</code>找到你的库；</li>
+<li>使用者可以顺畅使用你的库。</li>
+</ol>
+<h3 id="1-1-项目初始化：写CMakeLists-txt"><a href="#1-1-项目初始化：写CMakeLists-txt" class="headerlink" title="1.1 项目初始化：写CMakeLists.txt"></a>1.1 项目初始化：写CMakeLists.txt</h3><p>首先，告诉 CMake 这是一个库项目，并设置头文件目录：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.14</span>)</span><br><span class="line"><span class="keyword">project</span>(MathLib VERSION <span class="number">1.0</span>.<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义静态库目标</span></span><br><span class="line"><span class="keyword">add_library</span>(MathLib STATIC src/MathLib.cpp)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置头文件路径</span></span><br><span class="line"><span class="keyword">target_include_directories</span>(MathLib PUBLIC </span><br><span class="line">    $&lt;BUILD_INTERFACE:<span class="variable">$&#123;CMAKE_SOURCE_DIR&#125;</span>/<span class="keyword">include</span>&gt;   <span class="comment"># 构建时用</span></span><br><span class="line">    $&lt;INSTALL_INTERFACE:<span class="keyword">include</span>&gt;                    <span class="comment"># 安装后用</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>add_library(MathLib STATIC src/MathLib.cpp)</code>：告诉 CMake 我们要生成一个叫<code>MathLib</code>的静态库；</li>
+<li><code>target_include_directories</code>：设置头文件路径，这样用户无论是开发中用还是安装后用，都能找到头文件<ul>
+<li><code>BUILD_INTERFACE</code>：构建阶段使用<code>include/</code>目录；</li>
+<li><code>INSTALL_INTERFACE</code>：表示安装后，库和头文件会被复制到用户指定的安装路径，比如<code>/usr/local/include</code>或自定义的<code>/path/to/install/include</code>。</li>
+</ul>
+</li>
+</ul>
+<h3 id="1-2-安装库和头文件"><a href="#1-2-安装库和头文件" class="headerlink" title="1.2 安装库和头文件"></a>1.2 安装库和头文件</h3><p>现在库已经可以在项目中正常编译了，但为了方便使用，我们需要制作一个“安装包”，把头文件和库放到一个用户容易找到的位置。<br>在<code>CMakeLists.txt</code>中我们需要添加安装规则：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装库文件</span></span><br><span class="line"><span class="keyword">install</span>(TARGETS MathLib</span><br><span class="line">    <span class="keyword">EXPORT</span> MathLibTargets          <span class="comment"># 导出目标配置</span></span><br><span class="line">    ARCHIVE DESTINATION lib        <span class="comment"># 静态库安装到 lib 目录</span></span><br><span class="line">    LIBRARY DESTINATION lib        <span class="comment"># 动态库（如果有）安装到 lib 目录</span></span><br><span class="line">    RUNTIME DESTINATION bin        <span class="comment"># 可执行文件（如果有）安装到 bin 目录</span></span><br><span class="line">    INCLUDES DESTINATION <span class="keyword">include</span>   <span class="comment"># 安装头文件路径</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装头文件</span></span><br><span class="line"><span class="keyword">install</span>(DIRECTORY <span class="keyword">include</span>/ DESTINATION <span class="keyword">include</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>install(TARGETS MathLib ...)</code>：定义了库文件的安装规则：<ul>
+<li>静态库（<code>libMathLib.a</code>）会被安装到<code>lib/</code>目录下</li>
+<li>如果是动态库（<code>libMathLib.so</code>），也会被安装到<code>lib/</code>目录下</li>
+<li>可执行文件（如果有）会被安装到<code>bin/</code>目录下</li>
+<li>头文件的路径会被导出，方便用户查找</li>
+</ul>
+</li>
+<li><code>install(DIRECTORY include/ DESTINATION include)</code>：把<code>include/</code>目录中的头文件复制到安装路径的<code>include/</code>下。</li>
+</ul>
+<p>那么，安装路径在哪里呢？<br>CMake 默认会把这些文件安装到一个“根路径”下，这个根路径是用户在运行安装命令时通过<code>--prefix</code>指定的。比如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 用户执行安装命令：</span></span><br><span class="line">cmake --install build --prefix /path/to/install</span><br><span class="line"></span><br><span class="line"><span class="comment"># 最终的安装结果</span></span><br><span class="line">/path/to/install/</span><br><span class="line">├── lib/               <span class="comment"># 库文件</span></span><br><span class="line">│   └── libMathLib.a</span><br><span class="line">├── include/           <span class="comment"># 头文件</span></span><br><span class="line">└── └── MathLib.h</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>lib/</code>和<code>include/</code>是<code>install()</code>定义的相对路径；</li>
+<li><code>--prefix</code>指定了安装的根目录，最终路径是两者拼接而成。</li>
+</ul>
+<h3 id="1-3-生成配置文件"><a href="#1-3-生成配置文件" class="headerlink" title="1.3 生成配置文件"></a>1.3 生成配置文件</h3><p>为了让用户用<code>find_package(MathLib)</code>方便地找到库，我们需要生成两个配置文件：</p>
+<ol>
+<li><code>MathLibTargets.cmake</code>：由 CMake 生成，用来记录库的详细信息，比如：<ul>
+<li>库文件的位置（<code>libMathLib.a</code>或<code>libMathLib.so</code>）</li>
+<li>头文件的位置（<code>include/MathLib.h</code>）</li>
+</ul>
+</li>
+<li><code>MathLibConfig.cmake</code>：需要手写，它将负责引入<code>MathLibTargets.cmake</code>。用户调用<code>find_package(MathLib)</code>时，CMake 会先加载<code>MathLibConfig.cmake</code>，再通过它找到库的详细信息。</li>
+</ol>
+<p>首先，在根目录<code>CMakeLists.txt</code>中添加以下内容：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导出 MathLibTargets.cmake</span></span><br><span class="line"><span class="keyword">install</span>(<span class="keyword">EXPORT</span> MathLibTargets</span><br><span class="line">    <span class="keyword">FILE</span> MathLibTargets.cmake           <span class="comment"># 导出的文件名</span></span><br><span class="line">    NAMESPACE MathLib::                 <span class="comment"># 命名空间，用户会用 MathLib::MathLib 访问你的库</span></span><br><span class="line">    DESTINATION lib/cmake/MathLib       <span class="comment"># 安装到的路径</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装 MathLibConfig.cmake</span></span><br><span class="line"><span class="keyword">install</span>(FILES cmake/MathLibConfig.cmake DESTINATION lib/cmake/MathLib)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><code>install(EXPORT MathLibTargets ...)</code>：</p>
+<ul>
+<li>告诉 CMake 自动生成一个<code>MathLibTargets.cmake</code>文件；</li>
+<li>文件中会记录库的路径、头文件路径等信息；</li>
+<li>设置命名空间<code>MathLib::</code>，用户可以通过<code>MathLib::MathLib</code>使用你的库。</li>
+</ul>
+</li>
+<li><p><code>install(FILES ...)</code>：</p>
+<ul>
+<li>把手写的<code>MathLibConfig.cmake</code>文件安装到和<code>MathLibTargets.cmake</code>同一个目录下；</li>
+<li><code>MathLibConfig.cmake</code>的作用是引入<code>MathLibTargets.cmake</code>。</li>
+</ul>
+</li>
+</ul>
+<p>然后，在<code>cmake/</code>目录下新建一个文件<code>MathLibConfig.cmake</code>，内容如下：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 加载 MathLibTargets.cmake</span></span><br><span class="line"><span class="keyword">include</span>(<span class="string">&quot;$&#123;CMAKE_CURRENT_LIST_DIR&#125;/MathLibTargets.cmake&quot;</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>$&#123;CMAKE_CURRENT_LIST_DIR&#125;</code>：表示当前文件（<code>MathLibConfig.cmake</code>）所在的目录；</li>
+<li><code>include(...)</code>：加载同目录下的<code>MathLibTargets.cmake</code>，把库的详细信息交给<code>CMake</code>，用户可通过<code>find_package(MathLib)</code>找到目标。</li>
+</ul>
+<h3 id="1-4-处理依赖库"><a href="#1-4-处理依赖库" class="headerlink" title="1.4 处理依赖库"></a>1.4 处理依赖库</h3><p>有时候，你的库可能依赖第三方库，如<code>Boost</code>或<code>OpenCV</code>。为了让用户使用你的库时不需要额外配置这些依赖（如<code>Boost</code>），你需要以下两步：</p>
+<ol>
+<li>在<code>MathLibConfig.cmake</code>中追加以下内容：</li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span>(CMakeFindDependencyMacro)</span><br><span class="line">find_dependency(Boost REQUIRED)  <span class="comment"># 声明依赖 Boost</span></span><br><span class="line"><span class="keyword">include</span>(<span class="string">&quot;$&#123;CMAKE_CURRENT_LIST_DIR&#125;/MathLibTargets.cmake&quot;</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>include(CMakeFindDependencyMacro)</code>：引入一个专门用于声明依赖的宏；</li>
+<li><code>find_dependency(Boost REQUIRED)</code>：告诉 CMake，<code>MathLib</code>依赖<code>Boost</code>。<br>用户调用<code>find_package(MathLib)</code>时，CMake 会自动尝试加载<code>Boost</code>。</li>
+</ul>
+<ol start="2">
+<li>在目标上绑定依赖。在库的<code>CMakeLists.txt</code>中，告诉 CMake <code>MathLib</code>使用了<code>Boost</code>：</li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">target_link_libraries</span>(MathLib PUBLIC Boost::Boost)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>PUBLIC</code>：表示<code>Boost</code>是<code>MathLib</code>的公共依赖，任何链接<code>MathLib</code>的目标都会自动继承这个依赖。</li>
+</ul>
+<p>最终用户在自身的项目中使用<code>MathLib</code>库时，只需要以下两行代码：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">find_package</span>(MathLib REQUIRED)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(MyApp PUBLIC MathLib::MathLib)</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-5-用户如何使用你的库"><a href="#1-5-用户如何使用你的库" class="headerlink" title="1.5 用户如何使用你的库"></a>1.5 用户如何使用你的库</h3><h4 id="1-5-1-开发者安装库并分发给用户"><a href="#1-5-1-开发者安装库并分发给用户" class="headerlink" title="1.5.1 开发者安装库并分发给用户"></a>1.5.1 开发者安装库并分发给用户</h4><p>首先，开发者（你自己）需要先运行安装命令，把库整理好，分发给用户。假设你希望安装到<code>/path/to/install</code>：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cmake -S . -B build</span><br><span class="line">cmake --<span class="keyword">install</span> build --prefix /path/to/<span class="keyword">install</span></span><br></pre></td></tr></table></figure>
+
+<p>这条命令执行后，安装结果可能如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/path/to/install/</span><br><span class="line">├── include/           <span class="comment"># 头文件</span></span><br><span class="line">│   └── MathLib.h</span><br><span class="line">├── lib/               <span class="comment"># 库文件</span></span><br><span class="line">│   └── libMathLib.a</span><br><span class="line">└── lib/cmake/MathLib/ <span class="comment"># 配置文件</span></span><br><span class="line">    ├── MathLibConfig.cmake</span><br><span class="line">    └── MathLibTargets.cmake</span><br></pre></td></tr></table></figure>
+
+<p>这个目录包含了你的库、头文件和配置文件，用户只需要拿到这个目录，就可以方便地在自己的项目中使用。</p>
+<h4 id="1-5-2-用户是如何拿到库的？"><a href="#1-5-2-用户是如何拿到库的？" class="headerlink" title="1.5.2 用户是如何拿到库的？"></a>1.5.2 用户是如何拿到库的？</h4><p>这一步非常重要。用户可以通过以下几种方式获取你的库：</p>
+<ol>
+<li>开发者直接分发安装目录：<blockquote>
+<p>开发者把<code>/path/to/install/MathLib</code>压缩成一个包（如<code>MathLib-1.0.0.zip</code>），发给用户。用户解压后，就能直接使用这个库。</p>
+</blockquote>
+</li>
+<li>开发者提供安装包（<code>CPack</code>生成）：<blockquote>
+<p>如果你用<code>CPack</code>创建了<code>.zip</code>、<code>.deb</code>或<code>.rpm</code>等安装包，用户可以直接解压或通过包管理工具安装到自己的系统中；<br>接下来用户只需配置项目，让 CMake 知道去哪里找这个库。</p>
+</blockquote>
+</li>
+</ol>
+<h4 id="1-5-3-用户的-CMakeLists-txt-设置"><a href="#1-5-3-用户的-CMakeLists-txt-设置" class="headerlink" title="1.5.3 用户的 CMakeLists.txt 设置"></a>1.5.3 用户的 CMakeLists.txt 设置</h4><p>假设用户项目的目录结构是这样的：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MyApp/</span><br><span class="line">├── CMakeLists.txt       <span class="comment"># 用户的 CMake 配置</span></span><br><span class="line">└── main.cpp             <span class="comment"># 用户的代码</span></span><br></pre></td></tr></table></figure>
+
+<p>用户需要在自己的<code>CMakeLists.txt</code>中告诉 CMake 去哪里找你的库。配置如下：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.14</span>)</span><br><span class="line"><span class="keyword">project</span>(MyApp)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 指定 MathLib 的路径</span></span><br><span class="line"><span class="keyword">list</span>(APPEND CMAKE_PREFIX_PATH <span class="string">&quot;/path/to/install&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 找到 MathLib</span></span><br><span class="line"><span class="keyword">find_package</span>(MathLib REQUIRED)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义用户的可执行文件</span></span><br><span class="line"><span class="keyword">add_executable</span>(MyApp main.cpp)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(MyApp PRIVATE MathLib::MathLib)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>list(APPEND CMAKE_PREFIX_PATH &quot;/path/to/install&quot;)</code>：告诉 CMake 去<code>/path/to/install</code>目录找<code>MathLib</code>；</li>
+<li><code>find_package(MathLib REQUIRED)</code>：加载<code>MathLibConfig.cmake</code>文件，进而加载库目标（<code>MathLibTargets.cmake</code>）并配置好路径；</li>
+<li><code>target_link_libraries</code>：将用户自己的程序<code>MyApp</code>与<code>MathLib</code>链接在一起。</li>
+</ul>
+<h4 id="1-5-4-用户编译项目"><a href="#1-5-4-用户编译项目" class="headerlink" title="1.5.4 用户编译项目"></a>1.5.4 用户编译项目</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cmake -S . -B build  <span class="comment"># 配置项目，生成构建文件到 build/ 目录</span></span><br><span class="line">cmake --build build  <span class="comment"># 编译项目，使用 build/ 目录中的构建文件</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-CMake-最佳实践"><a href="#2-CMake-最佳实践" class="headerlink" title="2. CMake 最佳实践"></a>2. CMake 最佳实践</h2><ol>
+<li><p>明确最低版本要求<br>始终在<code>CMakeLists.txt</code>开头写上<code>cmake_minimum_required</code>，指定最低版本号，避免低版本环境下出现错误。</p>
+</li>
+<li><p>清晰的项目结构<br>把代码、头文件、第三方库、构建文件分开管理，可以参考以下结构：</p>
+</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">MyProject/</span><br><span class="line">├── CMakeLists.txt       <span class="comment"># 顶层配置文件</span></span><br><span class="line">├── src/                 <span class="comment"># 源代码</span></span><br><span class="line">├── include/             <span class="comment"># 头文件</span></span><br><span class="line">├── third_party/         <span class="comment"># 第三方库</span></span><br><span class="line">├── tests/               <span class="comment"># 测试代码</span></span><br><span class="line">└── cmake/               <span class="comment"># 自定义 CMake 模块</span></span><br></pre></td></tr></table></figure>
+<p>建议：用<code>include/</code>管理公共头文件，<code>src/</code>里只放私有代码。这样别人用你的项目时，不会被私有实现污染。</p>
+<ol start="3">
+<li>使用<code>target_*</code>系列命令<br>尽量使用<code>target_*</code>系列命令（比如<code>target_include_directories</code>、<code>target_link_libraries</code>）而不是全局变量（如<code>CMAKE_CXX_FLAGS</code>）。这样能保证配置是目标独立的，减少相互干扰。</li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 推荐：为每个目标单独设置选项</span></span><br><span class="line"><span class="keyword">target_compile_options</span>(my_target PRIVATE -Wall -Wextra)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 不推荐：直接修改全局编译器选项</span></span><br><span class="line"><span class="keyword">set</span>(CMAKE_CXX_FLAGS <span class="string">&quot;$&#123;CMAKE_CXX_FLAGS&#125; -Wall -Wextra&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>模块化管理多个子项目<br>如果你的项目有多个模块或子项目，可以使用 add_subdirectory() 将它们整合起来。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">MyProject/</span><br><span class="line">├── CMakeLists.txt         <span class="comment"># 顶层 CMake 配置</span></span><br><span class="line">├── src/</span><br><span class="line">│   ├── ModuleA/</span><br><span class="line">│   │   ├── CMakeLists.txt</span><br><span class="line">│   │   └── ...代码...</span><br><span class="line">│   ├── ModuleB/</span><br><span class="line">│   │   ├── CMakeLists.txt</span><br><span class="line">│   │   └── ...代码...</span><br></pre></td></tr></table></figure>
+<p>顶层 CMake 文件：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.14</span>)</span><br><span class="line"><span class="keyword">project</span>(MyProject)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加子项目</span></span><br><span class="line"><span class="keyword">add_subdirectory</span>(src/ModuleA)</span><br><span class="line"><span class="keyword">add_subdirectory</span>(src/ModuleB)</span><br></pre></td></tr></table></figure>
+<p>子项目 CMake 文件：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_library</span>(ModuleA module_a.cpp)</span><br><span class="line"><span class="keyword">target_include_directories</span>(ModuleA PUBLIC <span class="variable">$&#123;CMAKE_SOURCE_DIR&#125;</span>/<span class="keyword">include</span>)</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>显式设置标准（C++11&#x2F;14&#x2F;17&#x2F;20 等）<br>明确指定使用的 C++ 标准，避免依赖编译器的默认设置：</li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(CMAKE_CXX_STANDARD <span class="number">17</span>)</span><br><span class="line"><span class="keyword">set</span>(CMAKE_CXX_STANDARD_REQUIRED <span class="keyword">ON</span>)</span><br><span class="line"><span class="keyword">set</span>(CMAKE_CXX_EXTENSIONS <span class="keyword">OFF</span>)</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>使用<code>find_package</code>管理依赖<br>对于第三方库，优先用<code>find_package()</code>，可以让 CMake 自动找到库并链接：</li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">find_package</span>(Boost REQUIRED)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(my_target PRIVATE Boost::Boost)</span><br></pre></td></tr></table></figure>
+<p>如果没有现成的<code>find_package</code>配置，可以用<code>FetchContent</code>动态拉取：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span>(FetchContent)</span><br><span class="line">FetchContent_Declare(</span><br><span class="line">    googletest</span><br><span class="line">    GIT_REPOSITORY https://github.com/google/googletest.git</span><br><span class="line">    GIT_TAG release-<span class="number">1.12</span>.<span class="number">1</span></span><br><span class="line">)</span><br><span class="line">FetchContent_MakeAvailable(googletest)</span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li>使用<code>CMAKE_INSTALL_PREFIX</code>定义安装路径<br>不要硬编码路径，比如像下面这样写死路径会带来权限问题和不灵活性：</li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">install</span>(TARGETS MyLib DESTINATION /usr/local/lib)</span><br><span class="line"><span class="keyword">install</span>(DIRECTORY <span class="keyword">include</span>/ DESTINATION /usr/local/<span class="keyword">include</span>)</span><br></pre></td></tr></table></figure>
+<p>推荐写法：<br>用相对路径，让用户通过<code>CMAKE_INSTALL_PREFIX</code>自定义安装位置：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">install</span>(TARGETS MyLib DESTINATION lib)</span><br><span class="line"><span class="keyword">install</span>(DIRECTORY <span class="keyword">include</span>/ DESTINATION <span class="keyword">include</span>)</span><br></pre></td></tr></table></figure>
+<p>用户指定路径：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/path/to/install</span><br><span class="line">cmake --build build</span><br><span class="line">cmake --install build</span><br></pre></td></tr></table></figure>
+<ul>
+<li>文件会安装到<code>/path/to/install/lib</code>和<code>/path/to/install/include</code>；</li>
+<li>更灵活，无需管理员权限，可跨平台</li>
+</ul>
+<ol start="8">
+<li>定义安装规则<br>明确你的库、头文件和配置文件的安装路径，方便分发和集成：</li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">install</span>(TARGETS my_library</span><br><span class="line">    <span class="keyword">EXPORT</span> MyLibraryTargets</span><br><span class="line">    LIBRARY DESTINATION lib</span><br><span class="line">    ARCHIVE DESTINATION lib</span><br><span class="line">    INCLUDES DESTINATION <span class="keyword">include</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<ol start="9">
+<li>明确构建类型<br>默认情况下，CMake 构建可能没有设置具体的构建类型（Debug、Release 等）。建议在<code>CMakeLists.txt</code>中设置默认的构建类型，避免意外使用未优化的构建。</li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 默认构建类型为 Release</span></span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">NOT</span> CMAKE_BUILD_TYPE)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_BUILD_TYPE <span class="string">&quot;Release&quot;</span> CACHE <span class="keyword">STRING</span> <span class="string">&quot;Choose the build type&quot;</span> FORCE)</span><br><span class="line"><span class="keyword">endif</span> ()</span><br><span class="line"></span><br><span class="line">用户也可以使用命令行设置：</span><br><span class="line">cmake -DCMAKE_BUILD_TYPE=Debug ..</span><br></pre></td></tr></table></figure>
+
+<ol start="10">
+<li>启用单元测试<br>使用 CMake 的测试功能（如<code>CTest</code>）集成测试框架，比如<code>Google Test</code>：</li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enable_testing</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加测试可执行文件</span></span><br><span class="line"><span class="keyword">add_executable</span>(my_test <span class="keyword">test</span>.cpp)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(my_test PRIVATE gtest gtest_main)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 注册测试</span></span><br><span class="line"><span class="keyword">add_test</span>(NAME MyTest <span class="keyword">COMMAND</span> my_test)</span><br></pre></td></tr></table></figure>
+<p>通过<code>ctest</code>命令可以快速运行所有测试：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ctest --output-on-failure</span><br></pre></td></tr></table></figure>
+
+<ol start="11">
+<li>使用<code>build</code>目录分离构建文件<br>生成单独的<code>build</code>目录是 CMake 的最佳实践之一，优点如下：</li>
+</ol>
+<ul>
+<li>源码干净：所有构建文件（如<code>Makefile</code>、中间文件）都在<code>build</code>目录，源码不被污染；</li>
+<li>支持多构建类型：你可以创建<code>build-debug</code>、<code>build-release</code>等目录，分别管理调试版和发布版；</li>
+<li>易清理：删除<code>build</code>目录即可轻松重建，不影响源码。</li>
+</ul>
+<p>使用方法如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> build &amp;&amp; <span class="built_in">cd</span> build</span><br><span class="line">cmake -S .. -B .</span><br><span class="line">make</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-S ..</code>：指定源码目录。</li>
+<li><code>-B .</code>：指定构建目录（当前目录）。</li>
+</ul>
+<ol start="12">
+<li>定义接口库<br>如果有一些头文件没有实现（比如接口、纯抽象类），可以用<code>INTERFACE</code>库的方式管理：</li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_library</span>(MyInterface INTERFACE)</span><br><span class="line"><span class="keyword">target_include_directories</span>(MyInterface INTERFACE <span class="variable">$&#123;CMAKE_SOURCE_DIR&#125;</span>/<span class="keyword">include</span>)</span><br></pre></td></tr></table></figure>
+<p>接口库（<code>INTERFACE</code>）用于配置一些公共的链接和编译选项，常见于大型项目。</p>
+<ol start="13">
+<li>提供选项给用户<br>用<code>option()</code>提供可配置的功能开关，让用户更灵活地使用你的项目：</li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">option</span>(ENABLE_TESTS <span class="string">&quot;Enable building tests&quot;</span> <span class="keyword">ON</span>)</span><br><span class="line"><span class="keyword">if</span> (ENABLE_TESTS)</span><br><span class="line">  <span class="keyword">add_subdirectory</span>(tests)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure>
+
+<ol start="14">
+<li>使用<code>GNUInstallDirs</code>实现跨平台安装<br>为了适配不同平台的安装路径，使用<code>GNUInstallDirs</code>模块确保库在 Linux、Windows 和 macOS 上都能正确安装：</li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span>(GNUInstallDirs)</span><br><span class="line"></span><br><span class="line"><span class="keyword">install</span>(TARGETS mylib</span><br><span class="line">    ARCHIVE DESTINATION <span class="variable">$&#123;CMAKE_INSTALL_LIBDIR&#125;</span></span><br><span class="line">    LIBRARY DESTINATION <span class="variable">$&#123;CMAKE_INSTALL_LIBDIR&#125;</span></span><br><span class="line">    RUNTIME DESTINATION <span class="variable">$&#123;CMAKE_INSTALL_BINDIR&#125;</span></span><br><span class="line">    INCLUDES DESTINATION <span class="variable">$&#123;CMAKE_INSTALL_INCLUDEDIR&#125;</span>)</span><br></pre></td></tr></table></figure>
+
+<ol start="15">
+<li>支持多平台工具链<br>如果你的项目需要支持多平台（比如 Windows、Linux 和 macOS），或者需要交叉编译（比如为嵌入式设备构建），正确设置工具链文件是关键。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 在跨平台项目中，确保正确设置工具链文件</span></span><br><span class="line">cmake -DCMAKE_TOOLCHAIN_FILE=path/to/toolchain.cmake ..</span><br></pre></td></tr></table></figure>
+<p>编写工作链文件，如：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(CMAKE_SYSTEM_NAME Linux)</span><br><span class="line"><span class="keyword">set</span>(CMAKE_C_COMPILER /usr/bin/arm-linux-gnueabihf-gcc)</span><br><span class="line"><span class="keyword">set</span>(CMAKE_CXX_COMPILER /usr/bin/arm-linux-gnueabihf-g++)</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-小结"><a href="#3-小结" class="headerlink" title="3. 小结"></a>3. 小结</h2><ul>
+<li>写好<code>CMakeLists.txt</code>中库、头文件、配置文件、依赖库的关系，优雅分发你的库；</li>
+<li>使用最佳实践，让项目更加专业。</li>
+</ul>
+<h2 id="4-下篇预告"><a href="#4-下篇预告" class="headerlink" title="4. 下篇预告"></a>4. 下篇预告</h2><p>下一篇是本系列的最后一篇，以<code>spdlog</code>库为例，帮助读者更好地理解 CMake 如何助力开源库的分发和使用。</p>
+</div>
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2025-01-26</span>
+            
+                <span>该篇文章被 Zhang Chao</span>
+            
+            
+                <span>打上标签:
+                    
+                    
+                        <a href='/tags/CMake/'>
+                            CMake
+                        </a>
+                    
+                </span>
+             
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/%E5%B7%A5%E5%85%B7/'>
+                            工具
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    <br>
+    
+    
+        
+            
+    
+            <div class="post-footer-pre-next">
+                
+
+                
+                    <span class="post-footer-pre-next-last-span-right">下一篇：<a href="/2025/01/25/CMake-notes-4/">CMake教程（四）：CMake生成器表达式与自定义命令</a>
+                    </span>
+                
+            </div>
+    
+        
+    
+
+    
+        
+    <div class="comments-container">
+    <div id="comment-anchor"></div>
+    <div class="comment-area-title">
+         
+    </div>
+    
+        
+
+    
+    
+    
+    </div>
+
+
+     
+</div>
+
+
+
+                                      
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2025 Cz 
+
+            
+                
+
+            
+                
+                    / <a href="/contact/"> 联系 </a>
+                
+
+            
+        </span>
+       
+    
+</div>
+
+
+
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>🌊亦余心之所善兮，虽九死其犹未悔🌊</span>
+            
+                <span class="footer-last-span-right"><i>本站由<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/index.html">Hexo</a>驱动｜使用<a target="_blank" rel="noopener" href="https://github.com/HiNinoJay/hexo-theme-A4">Hexo-theme-A4</a>主题</i></span>
+            
+    
+</div>
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+    <!--目录-->
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript" ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" type="text/javascript" ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js" type="text/javascript" ></script>
+        
+<script src="/js/toc.js"></script>
+
+    
+
+    
+<script src="/js/randomHeaderContent.js"></script>
+
+    <!--回到顶部按钮-->
+    
+        
+<script src="/js/returnToTop.js"></script>
+
+    
+
+    
+        
+<script src="/js/returnToLastPage.js"></script>
+
+    
+
+
+
+
+
+<script src="/js/lightgallery/lightgallery.umd.min.js"></script>
+
+
+
+<script src="/js/lightgallery/plugins/lg-thumbnail.umd.min.js"></script>
+
+
+
+<script src="/js/lightgallery/plugins/lg-fullscreen.umd.min.js"></script>
+
+
+<script src="/js/lightgallery/plugins/lg-autoplay.umd.min.js"></script>
+
+
+<script src="/js/lightgallery/plugins/lg-zoom.umd.min.js"></script>
+
+
+<script src="/js/lightgallery/plugins/lg-rotate.umd.min.js"></script>
+
+
+<script src="/js/lightgallery/plugins/lg-paper.umd.min.js"></script>
+
+
+
+
+<script type="text/javascript">
+     
+    if (typeof lightGallery !== "undefined") {
+        var options1 = {
+            selector: '.gallery-item',
+            plugins: [lgThumbnail, lgFullscreen, lgAutoplay, lgZoom, lgRotate, lgPager], // 启用插件
+            thumbnail: true,          // 显示缩略图
+            zoom: true,               // 启用缩放功
+            rotate: true,             // 启用旋转功能能
+            autoplay: true,        // 启用自动播放功能
+            fullScreen: true,      // 启用全屏功能
+            pager: false, //页码,
+            zoomFromOrigin: true,   // 从原始位置缩放
+            actualSize: true,       // 启用查看实际大小的功能
+            enableZoomAfter: 300,    // 延迟缩放，确保图片加载完成后可缩放
+        };
+        lightGallery(document.getElementsByClassName('.article-gallery')[0], options1); // 修复选择器
+    }
+    
+</script>
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script> 
+
+                </div>
+            
+            
+                <!-- 回到顶部的按钮-->  
+                <div class="progress-wrap shadow-drop-2-bottom">
+                    <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+                        <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"/>
+                    </svg>
+                </div>
+            
+            
+                <!-- 返回的按钮-->  
+                <div class="return-to-last-progress-wrap shadow-drop-2-bottom">
+                    <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+                        <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"/>
+                    </svg>
+                </div>
+            
+    </body>
+</html>

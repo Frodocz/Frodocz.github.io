@@ -197,7 +197,7 @@
             <div class="post-head-meta-center">
         
                 
-                    <span>最近更新：2025-01-25</span> 
+                    <span>最近更新：2025-01-26</span> 
                 
                 
                     
@@ -236,7 +236,7 @@
 <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">list</span>(APPEND &lt;<span class="keyword">list</span>&gt; [&lt;element&gt; ...])</span><br></pre></td></tr></table></figure>
 <p><code>list</code>命令的功能比<code>set</code>要强大，字符串拼接只是它的其中一个功能，所以需要在它第一个参数的位置指定出我们要做的操作，<code>APPEND</code>表示进行数据追加，后边的参数和<code>set</code>一样。</p>
 <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.0</span>)</span><br><span class="line"><span class="keyword">project</span>(<span class="keyword">TEST</span>)</span><br><span class="line"><span class="keyword">set</span>(TEMP <span class="string">&quot;hello,world&quot;</span>)</span><br><span class="line"><span class="keyword">file</span>(GLOB SRC_1 <span class="variable">$&#123;PROJECT_SOURCE_DIR&#125;</span>/src1/*.cpp)</span><br><span class="line"><span class="keyword">file</span>(GLOB SRC_2 <span class="variable">$&#123;PROJECT_SOURCE_DIR&#125;</span>/src2/*.cpp)</span><br><span class="line"><span class="comment"># 追加(拼接)</span></span><br><span class="line"><span class="keyword">list</span>(APPEND SRC_1 <span class="variable">$&#123;SRC_2&#125;</span> <span class="variable">$&#123;TEMP&#125;</span>)</span><br><span class="line"><span class="keyword">message</span>(STATUS <span class="string">&quot;message: $&#123;SRC_1&#125;&quot;</span>)</span><br></pre></td></tr></table></figure>
-<p>在<code>CMake</code>中，使用<code>set</code>命令可以创建一个<code>list</code>。一个在<code>list</code>内部是一个由分号<code>;</code>分割的一组字符串。例如，<code>set(var a b c d e)</code>命令将会创建一个<code>list:a;b;c;d;e</code>，但是最终打印变量值的时候得到的是<code>abcde</code>。</p>
+<p>在<code>CMake</code>中，使用<code>set</code>命令可以创建一个<code>list</code>。一个<code>list</code>内部是一个由分号<code>;</code>分割的一组字符串。例如，<code>set(var a b c d e)</code>命令将会创建一个<code>list:a;b;c;d;e</code>，但是最终打印变量值的时候得到的是<code>abcde</code>。</p>
 <h3 id="1-2-字符串移除"><a href="#1-2-字符串移除" class="headerlink" title="1.2 字符串移除"></a>1.2 字符串移除</h3><p>在上面的例子中，我们通过<code>file</code>搜索某个目录就得到了该目录下所有的源文件，但是其中有些源文件并不是我们所需要的，比如：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">project/</span><br><span class="line">├── main.cpp</span><br><span class="line">├── helper1.cpp</span><br><span class="line">├── helper2.cpp</span><br><span class="line">└── CMakeLists.txt</span><br></pre></td></tr></table></figure>
 <p>在当前目录有三个源文件，其中<code>main.cpp</code>是一个测试文件。如果我们想要把相关的源文件生成一个动态库给别人使用，那么只需要<code>helper1.cpp</code>、<code>helper2.cpp</code>这两个源文件就可以了。此时，就需要将<code>main.cpp</code>从搜索到的数据中剔除出去。想要实现这个功能，也可以使用<code>list</code>：</p>
